@@ -24,7 +24,9 @@ local Theme = require(script.UI.Theme)
 local player = Players.LocalPlayer
 
 -- Pure 2D: no avatar, no backpack, a fixed camera. Chat stays, it is filtered and moderated by Roblox.
-for _, coreGui in { Enum.CoreGuiType.Backpack, Enum.CoreGuiType.Health, Enum.CoreGuiType.EmotesMenu, Enum.CoreGuiType.PlayerList } do
+for _, coreGui in
+	{ Enum.CoreGuiType.Backpack, Enum.CoreGuiType.Health, Enum.CoreGuiType.EmotesMenu, Enum.CoreGuiType.PlayerList }
+do
 	pcall(StarterGui.SetCoreGuiEnabled, StarterGui, coreGui, false)
 end
 local camera = workspace.CurrentCamera
@@ -119,7 +121,10 @@ UserInputService.InputChanged:Connect(function(input, processed)
 	end
 	if input.UserInputType == Enum.UserInputType.MouseWheel and not processed then
 		actions.mapZoom(if input.Position.Z > 0 then 1 else -1)
-	elseif drag and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+	elseif
+		drag
+		and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch)
+	then
 		local delta = input.Position - drag.last
 		drag.last = input.Position
 		drag.moved += delta.Magnitude
@@ -239,4 +244,12 @@ RunService.RenderStepped:Connect(function(dt)
 end)
 
 -- Keep the realm size visible in the output for whoever tests in Studio.
-print(string.format("[Kingdom of Robloxia] %d×%d realm, up to %d players and %d bots", Balance.MAP_SIZE, Balance.MAP_SIZE, Balance.MAX_REAL_PLAYERS, Balance.BOT_COUNT))
+print(
+	string.format(
+		"[Kingdom of Robloxia] %d×%d realm, up to %d players and %d bots",
+		Balance.MAP_SIZE,
+		Balance.MAP_SIZE,
+		Balance.MAX_REAL_PLAYERS,
+		Balance.BOT_COUNT
+	)
+)

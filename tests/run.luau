@@ -33,7 +33,15 @@ local expect = {}
 
 function expect.eq(actual: any, expected: any, message: string?)
 	if actual ~= expected then
-		error(string.format("%sexpected %s, got %s", if message then message .. ": " else "", serialize(expected), serialize(actual)), 2)
+		error(
+			string.format(
+				"%sexpected %s, got %s",
+				if message then message .. ": " else "",
+				serialize(expected),
+				serialize(actual)
+			),
+			2
+		)
 	end
 end
 
@@ -58,7 +66,16 @@ end
 
 function expect.near(actual: number, expected: number, tolerance: number, message: string?)
 	if math.abs(actual - expected) > tolerance then
-		error(string.format("%sexpected %s ± %s, got %s", if message then message .. ": " else "", expected, tolerance, actual), 2)
+		error(
+			string.format(
+				"%sexpected %s ± %s, got %s",
+				if message then message .. ": " else "",
+				expected,
+				tolerance,
+				actual
+			),
+			2
+		)
 	end
 end
 

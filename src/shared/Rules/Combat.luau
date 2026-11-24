@@ -62,7 +62,13 @@ local function keys(t: { [string]: any }): { string }
 end
 
 -- Units of `dst` killed by one round of fire from `src`.
-local function volley(src: Army.Troops, srcStats: Stats, dst: Army.Troops, dstStats: Stats, dstWall: number): Army.Troops
+local function volley(
+	src: Army.Troops,
+	srcStats: Stats,
+	dst: Army.Troops,
+	dstStats: Stats,
+	dstWall: number
+): Army.Troops
 	local dstTotal = Army.total(dst)
 	local kills: { [string]: number } = {}
 	if dstTotal <= 0 then
@@ -165,7 +171,13 @@ function Combat.huntDamage(data: any, troops: Army.Troops, hero: string?, heroLe
 end
 
 -- Rewards for dealing `damage` to a monster with `maxHp`, plus the kill bonus when it falls.
-function Combat.huntRewards(monster: string, level: number, damage: number, maxHp: number, killed: boolean): Economy.Resources
+function Combat.huntRewards(
+	monster: string,
+	level: number,
+	damage: number,
+	maxHp: number,
+	killed: boolean
+): Economy.Resources
 	local def = Balance.MONSTERS[monster]
 	local share = math.min(1, damage / maxHp)
 	local factor = level * (share + (if killed then Balance.KILL_BONUS else 0) * 0.25)

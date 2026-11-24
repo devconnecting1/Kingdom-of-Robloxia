@@ -201,7 +201,8 @@ function placeChildren(node: UiNode, w: number, h: number): Placed[] {
     const total = sizes.reduce((sum, s, i) => sum + (horizontal ? s.w : s.h) + (i > 0 ? gap : 0), 0);
     const mainAlign = horizontal ? hAlign : vAlign;
     const mainSpace = (horizontal ? innerW : innerH) - total;
-    let cursor = mainAlign === "Center" ? mainSpace / 2 : mainAlign === "Right" || mainAlign === "Bottom" ? mainSpace : 0;
+    let cursor =
+      mainAlign === "Center" ? mainSpace / 2 : mainAlign === "Right" || mainAlign === "Bottom" ? mainSpace : 0;
     sorted.forEach((k, i) => {
       const s = sizes[i];
       const crossAlign = horizontal ? vAlign : hAlign;
@@ -259,7 +260,11 @@ const ALIGN: Record<string, string> = { Top: "flex-start", Center: "center", Bot
 
 function paint(node: UiNode, el: HTMLElement, w: number, h: number): void {
   const transparency = num(node, "BackgroundTransparency", 0);
-  const background = color(node, "BackgroundColor3", node.class === "Frame" || node.class === "ScrollingFrame" ? GREY : WHITE);
+  const background = color(
+    node,
+    "BackgroundColor3",
+    node.class === "Frame" || node.class === "ScrollingFrame" ? GREY : WHITE,
+  );
   const gradient = child(node, "UIGradient");
   if (transparency < 1) {
     const seq = gradient ? sequence(gradient, "Color") : undefined;

@@ -50,8 +50,14 @@ local function card(state: any, actions: any, id: string, order: number, busy: b
 	local resources = Live.resources(view, state.now)
 	local kids: { [any]: any } = {
 		_corner = C.corner(16),
-		_gradient = if owned then C.gradient(Theme.colors[def.rarity], "panel", 90) else C.gradient("#2A3150", "#1A1F36"),
-		_stroke = C.stroke(if selected then "gold" else def.rarity, if selected then 3 else 2, if owned then 0 else 0.4),
+		_gradient = if owned
+			then C.gradient(Theme.colors[def.rarity], "panel", 90)
+			else C.gradient("#2A3150", "#1A1F36"),
+		_stroke = C.stroke(
+			if selected then "gold" else def.rarity,
+			if selected then 3 else 2,
+			if owned then 0 else 0.4
+		),
 		portrait = e("Frame", {
 			AnchorPoint = Vector2.new(0.5, 0),
 			Position = UDim2.new(0.5, 0, 0, px(14)),
@@ -61,10 +67,27 @@ local function card(state: any, actions: any, id: string, order: number, busy: b
 		}, {
 			_corner = C.round(),
 			_stroke = C.stroke(def.rarity, 3),
-			icon = C.text({ text = def.icon, size = 52, align = "Center", Size = UDim2.fromScale(1, 1), TextTransparency = if owned then 0 else 0.5 }),
+			icon = C.text({
+				text = def.icon,
+				size = 52,
+				align = "Center",
+				Size = UDim2.fromScale(1, 1),
+				TextTransparency = if owned then 0 else 0.5,
+			}),
 		}),
-		rarity = C.badge(t("rarity." .. def.rarity), def.rarity, { Position = UDim2.fromOffset(px(8), px(8)), TextSize = px(11), Size = UDim2.fromOffset(0, px(20)) }),
-		name = C.text({ text = t("hero." .. id), size = 16, font = "title", align = "Center", Position = UDim2.fromOffset(px(6), px(116)), Size = UDim2.new(1, -px(12), 0, px(22)) }),
+		rarity = C.badge(
+			t("rarity." .. def.rarity),
+			def.rarity,
+			{ Position = UDim2.fromOffset(px(8), px(8)), TextSize = px(11), Size = UDim2.fromOffset(0, px(20)) }
+		),
+		name = C.text({
+			text = t("hero." .. id),
+			size = 16,
+			font = "title",
+			align = "Center",
+			Position = UDim2.fromOffset(px(6), px(116)),
+			Size = UDim2.new(1, -px(12), 0, px(22)),
+		}),
 		bonus = C.text({
 			text = Heroes.bonusText(id, level),
 			size = 12,
@@ -84,9 +107,22 @@ local function card(state: any, actions: any, id: string, order: number, busy: b
 			TextSize = px(12),
 			Size = UDim2.fromOffset(0, px(20)),
 		})
-		kids.xp = e("Frame", { Position = UDim2.new(0, px(12), 1, -px(52)), Size = UDim2.new(1, -px(24), 0, px(14)), BackgroundTransparency = 1 }, {
-			bar = C.progress(if level >= Balance.HERO_MAX_LEVEL then 1 else hero.xp / next, "purple", 14, t("ui.xp", { xp = Format.short(hero.xp), next = Format.short(next) })),
-		})
+		kids.xp = e(
+			"Frame",
+			{
+				Position = UDim2.new(0, px(12), 1, -px(52)),
+				Size = UDim2.new(1, -px(24), 0, px(14)),
+				BackgroundTransparency = 1,
+			},
+			{
+				bar = C.progress(
+					if level >= Balance.HERO_MAX_LEVEL then 1 else hero.xp / next,
+					"purple",
+					14,
+					t("ui.xp", { xp = Format.short(hero.xp), next = Format.short(next) })
+				),
+			}
+		)
 		kids.status = C.text({
 			text = if busy then "🚩 " .. t("ui.busy") else "✅ " .. t("ui.ready"),
 			size = 13,
@@ -128,7 +164,13 @@ function Heroes.render(state: any, actions: any): Kit.Element
 	end
 	return e("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }, {
 		_pad = C.padding(18),
-		title = C.text({ text = "🦸 " .. t("nav.heroes"), size = 26, font = "title", color = "gold", Size = UDim2.new(1, 0, 0, px(34)) }),
+		title = C.text({
+			text = "🦸 " .. t("nav.heroes"),
+			size = 26,
+			font = "title",
+			color = "gold",
+			Size = UDim2.new(1, 0, 0, px(34)),
+		}),
 		sub = C.text({ text = t("ui.heroHint"), size = 14, color = "muted", Position = UDim2.fromOffset(0, px(36)) }),
 		grid = C.scroll({ Position = UDim2.fromOffset(0, px(68)), Size = UDim2.new(1, 0, 1, -px(68)) }, kids),
 	})

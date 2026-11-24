@@ -27,16 +27,32 @@ local function inGuild(state: any, actions: any): Kit.Element
 	local members: { [any]: any } = { _list = C.list("y", 6) }
 	for i, m in g.members do
 		members[i] = row(i, 46, {
-			rank = C.text({ text = "#" .. i, size = 14, font = "bold", color = "faint", align = "Center", Size = UDim2.fromOffset(px(40), px(46)) }),
+			rank = C.text({
+				text = "#" .. i,
+				size = 14,
+				font = "bold",
+				color = "faint",
+				align = "Center",
+				Size = UDim2.fromOffset(px(40), px(46)),
+			}),
 			name = C.text({
-				text = (if m.leader then "👑 " else "") .. m.name .. (if m.isBot then "  🤖" else "") .. (if m.kid == state.view.kid then "  ⭐" else ""),
+				text = (if m.leader then "👑 " else "") .. m.name .. (if m.isBot then "  🤖" else "") .. (if m.kid
+						== state.view.kid
+					then "  ⭐"
+					else ""),
 				size = 15,
 				font = "bold",
 				color = if m.kid == state.view.kid then "gold" else "text",
 				Position = UDim2.fromOffset(px(40), 0),
 				Size = UDim2.new(0.6, -px(40), 1, 0),
 			}),
-			keep = C.text({ text = "🏰 " .. m.keep, size = 14, color = "muted", Position = UDim2.fromScale(0.6, 0), Size = UDim2.new(0.15, 0, 1, 0) }),
+			keep = C.text({
+				text = "🏰 " .. m.keep,
+				size = 14,
+				color = "muted",
+				Position = UDim2.fromScale(0.6, 0),
+				Size = UDim2.new(0.15, 0, 1, 0),
+			}),
 			power = C.text({
 				text = "⚔ " .. Format.short(m.power),
 				size = 14,
@@ -58,9 +74,17 @@ local function inGuild(state: any, actions: any): Kit.Element
 		local label = if h.labelKind == "building" then t("b." .. h.label) else t("tech." .. h.label)
 		helps[i] = row(i, 58, {
 			_pad = C.padding(8, 12, 8, 12),
-			who = C.text({ text = h.name .. (if h.mine then " (" .. t("ui.you") .. ")" else ""), size = 14, font = "bold", Size = UDim2.new(1, 0, 0, px(20)) }),
+			who = C.text({
+				text = h.name .. (if h.mine then " (" .. t("ui.you") .. ")" else ""),
+				size = 14,
+				font = "bold",
+				Size = UDim2.new(1, 0, 0, px(20)),
+			}),
 			what = C.text({
-				text = label .. " → " .. t("ui.level", { level = h.level }) .. "  ·  " .. t("ui.helpProgress", { given = h.given, max = h.max }),
+				text = label .. " → " .. t("ui.level", { level = h.level }) .. "  ·  " .. t(
+					"ui.helpProgress",
+					{ given = h.given, max = h.max }
+				),
 				size = 13,
 				color = if h.helped then "green" else "muted",
 				Position = UDim2.fromOffset(0, px(22)),
@@ -69,11 +93,23 @@ local function inGuild(state: any, actions: any): Kit.Element
 		})
 	end
 	if #g.helps == 0 then
-		helps.empty = C.text({ text = t("ui.noHelp"), size = 14, color = "muted", wrap = true, Size = UDim2.new(1, 0, 0, px(40)) })
+		helps.empty = C.text({
+			text = t("ui.noHelp"),
+			size = 14,
+			color = "muted",
+			wrap = true,
+			Size = UDim2.new(1, 0, 0, px(40)),
+		})
 	end
 
 	return e("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }, {
-		title = C.text({ text = "🤝 [" .. g.tag .. "] " .. g.name, size = 26, font = "title", color = "gold", Size = UDim2.new(1, 0, 0, px(34)) }),
+		title = C.text({
+			text = "🤝 [" .. g.tag .. "] " .. g.name,
+			size = 26,
+			font = "title",
+			color = "gold",
+			Size = UDim2.new(1, 0, 0, px(34)),
+		}),
 		sub = C.text({
 			text = t("ui.members", { n = g.count, max = Balance.GUILD_MAX_MEMBERS }),
 			size = 14,
@@ -89,14 +125,23 @@ local function inGuild(state: any, actions: any): Kit.Element
 			Position = UDim2.fromScale(1, 0),
 			onClick = actions.guildLeave,
 		}),
-		members = C.scroll({ Position = UDim2.fromOffset(0, px(70)), Size = UDim2.new(0.55, -px(10), 1, -px(70)) }, members),
+		members = C.scroll(
+			{ Position = UDim2.fromOffset(0, px(70)), Size = UDim2.new(0.55, -px(10), 1, -px(70)) },
+			members
+		),
 		helpBox = C.panel({
 			AnchorPoint = Vector2.new(1, 0),
 			Position = UDim2.new(1, 0, 0, px(70)),
 			Size = UDim2.new(0.45, -px(10), 1, -px(70)),
 		}, {
 			_pad = C.padding(14),
-			title = C.text({ text = "🔨 " .. t("ui.guildHelp"), size = 18, font = "title", color = "gold", Size = UDim2.new(1, 0, 0, px(26)) }),
+			title = C.text({
+				text = "🔨 " .. t("ui.guildHelp"),
+				size = 18,
+				font = "title",
+				color = "gold",
+				Size = UDim2.new(1, 0, 0, px(26)),
+			}),
 			list = C.scroll({ Position = UDim2.fromOffset(0, px(34)), Size = UDim2.new(1, 0, 1, -px(34 + 60)) }, helps),
 			help = C.button({
 				text = "🤝 " .. t("ui.helpAll") .. (if open > 0 then " (" .. open .. ")" else ""),
@@ -117,9 +162,17 @@ local function noGuild(state: any, actions: any): Kit.Element
 		local full = g.count >= Balance.GUILD_MAX_MEMBERS
 		list[i] = row(i, 60, {
 			tag = C.badge(g.tag, "purple", { Position = UDim2.fromOffset(px(12), px(18)), TextSize = px(13) }),
-			name = C.text({ text = g.name, size = 17, font = "title", Position = UDim2.fromOffset(px(70), px(8)), Size = UDim2.new(1, -px(230), 0, px(24)) }),
+			name = C.text({
+				text = g.name,
+				size = 17,
+				font = "title",
+				Position = UDim2.fromOffset(px(70), px(8)),
+				Size = UDim2.new(1, -px(230), 0, px(24)),
+			}),
 			info = C.text({
-				text = t("ui.members", { n = g.count, max = Balance.GUILD_MAX_MEMBERS }) .. "  ·  ⚔ " .. Format.short(g.power),
+				text = t("ui.members", { n = g.count, max = Balance.GUILD_MAX_MEMBERS })
+					.. "  ·  ⚔ "
+					.. Format.short(g.power),
 				size = 13,
 				color = "muted",
 				Position = UDim2.fromOffset(px(70), px(32)),
@@ -150,8 +203,21 @@ local function noGuild(state: any, actions: any): Kit.Element
 		end
 	end
 	return e("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }, {
-		title = C.text({ text = "🤝 " .. t("nav.guild"), size = 26, font = "title", color = "gold", Size = UDim2.new(1, 0, 0, px(34)) }),
-		sub = C.text({ text = t("ui.noGuild"), size = 14, color = "muted", wrap = true, Position = UDim2.fromOffset(0, px(36)), Size = UDim2.new(1, 0, 0, px(22)) }),
+		title = C.text({
+			text = "🤝 " .. t("nav.guild"),
+			size = 26,
+			font = "title",
+			color = "gold",
+			Size = UDim2.new(1, 0, 0, px(34)),
+		}),
+		sub = C.text({
+			text = t("ui.noGuild"),
+			size = 14,
+			color = "muted",
+			wrap = true,
+			Position = UDim2.fromOffset(0, px(36)),
+			Size = UDim2.new(1, 0, 0, px(22)),
+		}),
 		list = C.scroll({ Position = UDim2.fromOffset(0, px(70)), Size = UDim2.new(0.58, -px(10), 1, -px(70)) }, list),
 		create = C.panel({
 			AnchorPoint = Vector2.new(1, 0),
@@ -160,16 +226,48 @@ local function noGuild(state: any, actions: any): Kit.Element
 		}, {
 			_pad = C.padding(16),
 			_list = C.list("y", 12, "Center"),
-			title = C.text({ text = "🏳️ " .. t("ui.pickName"), size = 18, font = "title", color = "gold", LayoutOrder = 1 }),
+			title = C.text({
+				text = "🏳️ " .. t("ui.pickName"),
+				size = 18,
+				font = "title",
+				color = "gold",
+				LayoutOrder = 1,
+			}),
 			adj = e("Frame", { Size = UDim2.new(1, 0, 0, px(44)), BackgroundTransparency = 1, LayoutOrder = 2 }, {
 				prev = C.iconButton("◀", "previous word", cycle("adj", -1), 44),
-				word = C.text({ text = adj, size = 22, font = "title", align = "Center", Position = UDim2.fromOffset(px(50), 0), Size = UDim2.new(1, -px(100), 1, 0) }),
-				next = C.iconButton("▶", "next word", cycle("adj", 1), 44, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.fromScale(1, 0) }),
+				word = C.text({
+					text = adj,
+					size = 22,
+					font = "title",
+					align = "Center",
+					Position = UDim2.fromOffset(px(50), 0),
+					Size = UDim2.new(1, -px(100), 1, 0),
+				}),
+				next = C.iconButton(
+					"▶",
+					"next word",
+					cycle("adj", 1),
+					44,
+					{ AnchorPoint = Vector2.new(1, 0), Position = UDim2.fromScale(1, 0) }
+				),
 			}),
 			noun = e("Frame", { Size = UDim2.new(1, 0, 0, px(44)), BackgroundTransparency = 1, LayoutOrder = 3 }, {
 				prev = C.iconButton("◀", "previous word", cycle("noun", -1), 44),
-				word = C.text({ text = noun, size = 22, font = "title", align = "Center", Position = UDim2.fromOffset(px(50), 0), Size = UDim2.new(1, -px(100), 1, 0) }),
-				next = C.iconButton("▶", "next word", cycle("noun", 1), 44, { AnchorPoint = Vector2.new(1, 0), Position = UDim2.fromScale(1, 0) }),
+				word = C.text({
+					text = noun,
+					size = 22,
+					font = "title",
+					align = "Center",
+					Position = UDim2.fromOffset(px(50), 0),
+					Size = UDim2.new(1, -px(100), 1, 0),
+				}),
+				next = C.iconButton(
+					"▶",
+					"next word",
+					cycle("noun", 1),
+					44,
+					{ AnchorPoint = Vector2.new(1, 0), Position = UDim2.fromScale(1, 0) }
+				),
 			}),
 			create = C.button({
 				text = t("ui.create", { gold = Balance.GUILD_CREATE_GOLD }),

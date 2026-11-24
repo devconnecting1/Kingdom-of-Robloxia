@@ -75,7 +75,14 @@ return function(test, expect, load)
 	end)
 
 	test("migrate fills new fields and drops unknown ids", function()
-		local old = { resources = { food = 5 }, buildings = { keep = 3 }, troops = { inf1 = 4, ghost = 9 }, heroes = {}, stats = {}, reports = {} }
+		local old = {
+			resources = { food = 5 },
+			buildings = { keep = 3 },
+			troops = { inf1 = 4, ghost = 9 },
+			heroes = {},
+			stats = {},
+			reports = {},
+		}
 		local data = Schema.migrate(old, "Ana", 100)
 		expect.eq(data.buildings.keep, 3)
 		expect.eq(data.troops.ghost, nil)

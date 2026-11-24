@@ -5,7 +5,10 @@
 local RateLimiter = {}
 RateLimiter.__index = RateLimiter
 
-export type Limiter = typeof(setmetatable({} :: { rate: number, burst: number, buckets: { [number]: { tokens: number, at: number } } }, RateLimiter))
+export type Limiter = typeof(setmetatable(
+	{} :: { rate: number, burst: number, buckets: { [number]: { tokens: number, at: number } } },
+	RateLimiter
+))
 
 function RateLimiter.new(rate: number, burst: number): Limiter
 	return setmetatable({ rate = rate, burst = burst, buckets = {} }, RateLimiter)

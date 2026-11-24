@@ -68,7 +68,11 @@ local function plot(state: any, actions: any, id: string, cell: number, gap: num
 			then C.gradient("#2A3150", "#1A1F36")
 			elseif big then C.gradient("#6C5BD6", "#3B2F8A")
 			else C.gradient("#3B6E4A", "#244A33"),
-		_stroke = C.stroke(if job then "blue" elseif canUpgrade then "gold" else "line", if canUpgrade or job then 2.5 else 1.5, if locked then 0.6 else 0),
+		_stroke = C.stroke(
+			if job then "blue" elseif canUpgrade then "gold" else "line",
+			if canUpgrade or job then 2.5 else 1.5,
+			if locked then 0.6 else 0
+		),
 		icon = C.text({
 			text = if locked then "🔒" else def.icon,
 			size = if big then 76 else 40,
@@ -165,16 +169,35 @@ function City.render(state: any, actions: any): Kit.Element
 		Size = UDim2.new(1, -px(48), 0, px(56)),
 		BackgroundTransparency = 1,
 	}, {
-		title = C.text({ text = "🏰 " .. view.name, size = 28, font = "title", color = "gold", Size = UDim2.new(0.5, 0, 0, px(34)) }),
+		title = C.text({
+			text = "🏰 " .. view.name,
+			size = 28,
+			font = "title",
+			color = "gold",
+			Size = UDim2.new(0.5, 0, 0, px(34)),
+		}),
 		sub = C.text({
-			text = t("ui.storage", { v = Format.short(view.cap) }) .. "   ·   " .. t("ui.protected", { v = Format.short(view.protected) }),
+			text = t("ui.storage", { v = Format.short(view.cap) })
+				.. "   ·   "
+				.. t("ui.protected", { v = Format.short(view.protected) }),
 			size = 14,
 			color = "muted",
 			Position = UDim2.fromOffset(0, px(34)),
 			Size = UDim2.new(0.6, 0, 0, px(20)),
 		}),
 		prod = C.text({
-			text = "📈 " .. t("ui.production") .. ": 🌾 " .. Format.short(rates.food) .. "  🪵 " .. Format.short(rates.wood) .. "  🪨 " .. Format.short(rates.stone) .. "  ⛓️ " .. Format.short(rates.ore) .. "  🪙 " .. Format.short(rates.gold),
+			text = "📈 "
+				.. t("ui.production")
+				.. ": 🌾 "
+				.. Format.short(rates.food)
+				.. "  🪵 "
+				.. Format.short(rates.wood)
+				.. "  🪨 "
+				.. Format.short(rates.stone)
+				.. "  ⛓️ "
+				.. Format.short(rates.ore)
+				.. "  🪙 "
+				.. Format.short(rates.gold),
 			size = 14,
 			font = "bold",
 			color = "green",

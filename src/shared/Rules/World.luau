@@ -591,7 +591,11 @@ function World.sendMarch(self: World, k: Kingdom, p: any, now: number): (string?
 	self.marchesDirty = true
 	if (p.kind == "attack" or p.kind == "scout") and target.kid then
 		self.dirtyKingdoms[target.kid] = true
-		self:toast(target.kid, if p.kind == "attack" then "toast.incoming" else "toast.scoutIncoming", { name = k.name })
+		self:toast(
+			target.kid,
+			if p.kind == "attack" then "toast.incoming" else "toast.scoutIncoming",
+			{ name = k.name }
+		)
 	end
 	return nil, m.id
 end
@@ -952,7 +956,8 @@ function World.helpAll(self: World, k: Kingdom, now: number): number
 		if help.kid ~= k.id and not help.helpers[k.id] and owner then
 			local job = City.findJob(owner.data, help.job)
 			if job then
-				local cut = math.max(Balance.GUILD_HELP_MIN_SECONDS, (job.endAt - job.startAt) * Balance.GUILD_HELP_SHARE)
+				local cut =
+					math.max(Balance.GUILD_HELP_MIN_SECONDS, (job.endAt - job.startAt) * Balance.GUILD_HELP_SHARE)
 				job.endAt -= cut
 				help.given += 1
 				help.helpers[k.id] = true
@@ -1305,7 +1310,13 @@ function World.view(self: World, kid: string, now: number): any
 		shieldUntil = data.shieldUntil,
 		beginner = Economy.level(data, "keep") < Balance.BEGINNER_KEEP and not data.peaceBroken,
 		quest = if questDef
-			then { id = questDef.id, progress = questProgress, goal = questDef.amount, done = questDone, reward = questDef.reward }
+			then {
+				id = questDef.id,
+				progress = questProgress,
+				goal = questDef.amount,
+				done = questDone,
+				reward = questDef.reward,
+			}
 			else nil,
 		guild = self:guildView(k),
 		guilds = if k.guild then nil else self:guildList(),

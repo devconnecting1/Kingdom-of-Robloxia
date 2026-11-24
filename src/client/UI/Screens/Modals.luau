@@ -29,11 +29,20 @@ function Modals.effect(id: string, level: number): string
 		return "–"
 	end
 	if def.produces and def.baseRate then
-		return t("eff.production", { v = Format.short(math.floor(def.baseRate * level ^ Balance.RATE_EXPONENT)), res = t("res." .. def.produces) })
+		return t(
+			"eff.production",
+			{
+				v = Format.short(math.floor(def.baseRate * level ^ Balance.RATE_EXPONENT)),
+				res = t("res." .. def.produces),
+			}
+		)
 	elseif id == "keep" then
 		return t("eff.keep", { v = Format.short(Economy.storageCap(data)), level = level })
 	elseif id == "barracks" then
-		local tier = if level >= Balance.EFFECTS.tier3Barracks then 3 elseif level >= Balance.EFFECTS.tier2Barracks then 2 else 1
+		local tier = if level >= Balance.EFFECTS.tier3Barracks
+			then 3
+			elseif level >= Balance.EFFECTS.tier2Barracks then 2
+			else 1
 		return t("eff.barracks", { v = Army.batchSize(data), tier = tier })
 	elseif id == "wall" then
 		return t("eff.wall", { v = Format.percent(level * Balance.EFFECTS.wallDefensePerLevel) })
@@ -81,7 +90,8 @@ local function buildingModal(state: any, actions: any, id: string): Kit.Element
 				icon = C.text({ text = def.icon, size = 56, align = "Center", Size = UDim2.fromScale(1, 1) }),
 			}),
 			level = C.text({
-				text = t("ui.level", { level = level }) .. (if maxed then "  ⭐" else "  →  " .. t("ui.level", { level = nextLevel })),
+				text = t("ui.level", { level = level })
+					.. (if maxed then "  ⭐" else "  →  " .. t("ui.level", { level = nextLevel })),
 				size = 22,
 				font = "title",
 				color = "gold",
@@ -100,7 +110,12 @@ local function buildingModal(state: any, actions: any, id: string): Kit.Element
 		}),
 		effect = C.panel({ Size = UDim2.new(1, 0, 0, px(62)), LayoutOrder = 2 }, {
 			_pad = C.padding(10, 14, 10, 14),
-			now = C.text({ text = "📊 " .. Modals.effect(id, level), size = 15, font = "bold", Size = UDim2.new(1, 0, 0, px(20)) }),
+			now = C.text({
+				text = "📊 " .. Modals.effect(id, level),
+				size = 15,
+				font = "bold",
+				Size = UDim2.new(1, 0, 0, px(20)),
+			}),
 			next = C.text({
 				text = if maxed then t("ui.maxed") else "⬆ " .. Modals.effect(id, nextLevel),
 				size = 15,
@@ -112,12 +127,27 @@ local function buildingModal(state: any, actions: any, id: string): Kit.Element
 		}, "flat"),
 	}
 	if not maxed then
-		body.costTitle = C.text({ text = t("ui.cost") .. "  ·  ⏱ " .. Format.duration(time), size = 14, font = "bold", color = "muted", LayoutOrder = 3 })
-		body.cost = e("Frame", { Size = UDim2.new(1, 0, 0, px(28)), BackgroundTransparency = 1, LayoutOrder = 4 }, { row = C.costRow(cost, resources) })
+		body.costTitle = C.text({
+			text = t("ui.cost") .. "  ·  ⏱ " .. Format.duration(time),
+			size = 14,
+			font = "bold",
+			color = "muted",
+			LayoutOrder = 3,
+		})
+		body.cost = e(
+			"Frame",
+			{ Size = UDim2.new(1, 0, 0, px(28)), BackgroundTransparency = 1, LayoutOrder = 4 },
+			{ row = C.costRow(cost, resources) }
+		)
 	end
 	if job then
 		body.progress = e("Frame", { Size = UDim2.new(1, 0, 0, px(22)), BackgroundTransparency = 1, LayoutOrder = 5 }, {
-			bar = C.progress(Live.fraction(job, state.now), "blue", 22, "⏳ " .. Format.duration(Live.left(job, state.now))),
+			bar = C.progress(
+				Live.fraction(job, state.now),
+				"blue",
+				22,
+				"⏳ " .. Format.duration(Live.left(job, state.now))
+			),
 		})
 	elseif err and err ~= "err.notEnough" and not maxed then
 		body.reason = C.text({ text = "⚠ " .. t(err), size = 14, font = "bold", color = "orange", LayoutOrder = 5 })
@@ -133,7 +163,13 @@ local function buildingModal(state: any, actions: any, id: string): Kit.Element
 			actions.upgrade(id)
 		end,
 	})
-	return C.modal(t("b." .. id), 560, 470, actions.closeModal, { content = e("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }, body) })
+	return C.modal(
+		t("b." .. id),
+		560,
+		470,
+		actions.closeModal,
+		{ content = e("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1 }, body) }
+	)
 end
 
 local KIND_TITLE = { gather = "ui.gather", hunt = "ui.hunt", attack = "ui.attack", scout = "ui.scout" }
@@ -159,9 +195,26 @@ local function marchModal(state: any, actions: any, modal: any): Kit.Element
 				end
 			end
 			rows[id] = C.panel({ Size = UDim2.new(1, -px(8), 0, px(48)), LayoutOrder = order }, {
-				icon = C.text({ text = Balance.TROOPS[id].icon, size = 22, align = "Center", Size = UDim2.fromOffset(px(44), px(48)) }),
-				name = C.text({ text = t("t." .. id), size = 14, font = "bold", Position = UDim2.fromOffset(px(44), px(4)), Size = UDim2.new(0.4, 0, 0, px(20)) }),
-				have = C.text({ text = "/ " .. Format.thousands(have), size = 12, color = "faint", Position = UDim2.fromOffset(px(44), px(24)), Size = UDim2.new(0.4, 0, 0, px(18)) }),
+				icon = C.text({
+					text = Balance.TROOPS[id].icon,
+					size = 22,
+					align = "Center",
+					Size = UDim2.fromOffset(px(44), px(48)),
+				}),
+				name = C.text({
+					text = t("t." .. id),
+					size = 14,
+					font = "bold",
+					Position = UDim2.fromOffset(px(44), px(4)),
+					Size = UDim2.new(0.4, 0, 0, px(20)),
+				}),
+				have = C.text({
+					text = "/ " .. Format.thousands(have),
+					size = 12,
+					color = "faint",
+					Position = UDim2.fromOffset(px(44), px(24)),
+					Size = UDim2.new(0.4, 0, 0, px(18)),
+				}),
 				controls = e("Frame", {
 					AnchorPoint = Vector2.new(1, 0.5),
 					Position = UDim2.new(1, -px(8), 0.5, 0),
@@ -169,24 +222,59 @@ local function marchModal(state: any, actions: any, modal: any): Kit.Element
 					BackgroundTransparency = 1,
 				}, {
 					_list = C.list("x", 6, "Right", "Center"),
-					none = C.button({ text = "0", variant = "ghost", textSize = 13, size = UDim2.fromOffset(px(36), px(34)), LayoutOrder = 1, onClick = set(0) }),
+					none = C.button({
+						text = "0",
+						variant = "ghost",
+						textSize = 13,
+						size = UDim2.fromOffset(px(36), px(34)),
+						LayoutOrder = 1,
+						onClick = set(0),
+					}),
 					minus = C.iconButton("−", "fewer", set(n - 10), 34, { LayoutOrder = 2 }),
-					value = C.text({ text = Format.thousands(n), size = 16, font = "title", align = "Center", color = if n > 0 then "gold" else "muted", Size = UDim2.fromOffset(px(60), px(34)), LayoutOrder = 3 }),
+					value = C.text({
+						text = Format.thousands(n),
+						size = 16,
+						font = "title",
+						align = "Center",
+						color = if n > 0 then "gold" else "muted",
+						Size = UDim2.fromOffset(px(60), px(34)),
+						LayoutOrder = 3,
+					}),
 					plus = C.iconButton("+", "more", set(n + 10), 34, { LayoutOrder = 4 }),
-					all = C.button({ text = t("ui.max"), variant = "ghost", textSize = 13, size = UDim2.fromOffset(px(44), px(34)), LayoutOrder = 5, onClick = set(have) }),
+					all = C.button({
+						text = t("ui.max"),
+						variant = "ghost",
+						textSize = 13,
+						size = UDim2.fromOffset(px(44), px(34)),
+						LayoutOrder = 5,
+						onClick = set(have),
+					}),
 				}),
 			}, "flat")
 		end
 	end
 	if scouting then
-		rows.note = C.text({ text = "👁️ " .. t("ui.scoutFree"), size = 15, color = "muted", wrap = true, Size = UDim2.new(1, 0, 0, px(40)) })
+		rows.note = C.text({
+			text = "👁️ " .. t("ui.scoutFree"),
+			size = 15,
+			color = "muted",
+			wrap = true,
+			Size = UDim2.new(1, 0, 0, px(40)),
+		})
 	end
 
 	local heroes: { [any]: any } = { _list = C.list("x", 6, "Left", "Center") }
 	if not scouting then
-		heroes.none = C.button({ text = t("ui.noHero"), variant = if hero == nil then "gold" else "ghost", textSize = 12, size = UDim2.fromOffset(px(86), px(36)), LayoutOrder = 0, onClick = function()
-			actions.setMarchHero(nil)
-		end })
+		heroes.none = C.button({
+			text = t("ui.noHero"),
+			variant = if hero == nil then "gold" else "ghost",
+			textSize = 12,
+			size = UDim2.fromOffset(px(86), px(36)),
+			LayoutOrder = 0,
+			onClick = function()
+				actions.setMarchHero(nil)
+			end,
+		})
 		local busy = {}
 		for _, m in view.marches do
 			if m.hero then
@@ -211,41 +299,87 @@ local function marchModal(state: any, actions: any, modal: any): Kit.Element
 
 	local travel = if scouting
 		then math.max(3, math.ceil(Army.distance(castle.x, castle.y, modal.x, modal.y) / 30 * 60))
-		elseif total > 0 then Army.travelSeconds(data, troops, hero, heroLevel, castle.x, castle.y, modal.x, modal.y)
+		elseif total > 0 then Army.travelSeconds(
+			data,
+			troops,
+			hero,
+			heroLevel,
+			castle.x,
+			castle.y,
+			modal.x,
+			modal.y
+		)
 		else 0
-	local summary = "🚶 " .. Format.thousands(total) .. " / " .. Format.thousands(view.marchSize) .. "   ·   ⏱ " .. t("ui.travel", { time = Format.duration(travel) })
+	local summary = "🚶 "
+		.. Format.thousands(total)
+		.. " / "
+		.. Format.thousands(view.marchSize)
+		.. "   ·   ⏱ "
+		.. t("ui.travel", { time = Format.duration(travel) })
 	if modal.march == "gather" and total > 0 then
 		summary ..= "   ·   🎒 " .. t("ui.load", { v = Format.short(Army.load(data, troops, hero, heroLevel)) })
 	elseif modal.march == "hunt" and total > 0 then
-		summary ..= "   ·   💥 " .. t("ui.damage", { v = Format.short(Combat.huntDamage(data, troops, hero, heroLevel)) })
+		summary ..= "   ·   💥 " .. t(
+			"ui.damage",
+			{ v = Format.short(Combat.huntDamage(data, troops, hero, heroLevel)) }
+		)
 	end
 	local over = total > view.marchSize
 	local ok = scouting or (total > 0 and not over)
 
-	return C.modal(t(KIND_TITLE[modal.march]) .. " · " .. t("ui.coords", { x = modal.x, y = modal.y }), 640, 560, actions.closeModal, {
-		title = C.text({ text = t("ui.selectTroops"), size = 15, font = "bold", color = "muted", Size = UDim2.new(1, 0, 0, px(20)) }),
-		rows = C.scroll({ Position = UDim2.fromOffset(0, px(26)), Size = UDim2.new(1, 0, 1, -px(26 + 160)) }, rows),
-		heroTitle = C.text({ text = "🦸 " .. t("ui.hero"), size = 14, font = "bold", color = "muted", AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 0, 1, -px(128)), Visible = not scouting }),
-		heroes = e("Frame", { AnchorPoint = Vector2.new(0, 1), Position = UDim2.new(0, 0, 1, -px(86)), Size = UDim2.new(1, 0, 0, px(38)), BackgroundTransparency = 1 }, heroes),
-		summary = C.text({
-			text = summary,
-			size = 14,
-			font = "bold",
-			color = if over then "red" else "text",
-			AnchorPoint = Vector2.new(0, 1),
-			Position = UDim2.new(0, 0, 1, -px(60)),
-		}),
-		send = C.button({
-			text = "🚩 " .. t("ui.send"),
-			variant = if modal.march == "attack" then "red" else "green",
-			disabled = not ok,
-			size = UDim2.new(1, 0, 0, px(50)),
-			textSize = 20,
-			AnchorPoint = Vector2.new(0, 1),
-			Position = UDim2.fromScale(0, 1),
-			onClick = actions.sendMarch,
-		}),
-	})
+	return C.modal(
+		t(KIND_TITLE[modal.march]) .. " · " .. t("ui.coords", { x = modal.x, y = modal.y }),
+		640,
+		560,
+		actions.closeModal,
+		{
+			title = C.text({
+				text = t("ui.selectTroops"),
+				size = 15,
+				font = "bold",
+				color = "muted",
+				Size = UDim2.new(1, 0, 0, px(20)),
+			}),
+			rows = C.scroll({ Position = UDim2.fromOffset(0, px(26)), Size = UDim2.new(1, 0, 1, -px(26 + 160)) }, rows),
+			heroTitle = C.text({
+				text = "🦸 " .. t("ui.hero"),
+				size = 14,
+				font = "bold",
+				color = "muted",
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.new(0, 0, 1, -px(128)),
+				Visible = not scouting,
+			}),
+			heroes = e(
+				"Frame",
+				{
+					AnchorPoint = Vector2.new(0, 1),
+					Position = UDim2.new(0, 0, 1, -px(86)),
+					Size = UDim2.new(1, 0, 0, px(38)),
+					BackgroundTransparency = 1,
+				},
+				heroes
+			),
+			summary = C.text({
+				text = summary,
+				size = 14,
+				font = "bold",
+				color = if over then "red" else "text",
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.new(0, 0, 1, -px(60)),
+			}),
+			send = C.button({
+				text = "🚩 " .. t("ui.send"),
+				variant = if modal.march == "attack" then "red" else "green",
+				disabled = not ok,
+				size = UDim2.new(1, 0, 0, px(50)),
+				textSize = 20,
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.fromScale(0, 1),
+				onClick = actions.sendMarch,
+			}),
+		}
+	)
 end
 
 local function rankingModal(state: any, actions: any): Kit.Element
@@ -253,8 +387,22 @@ local function rankingModal(state: any, actions: any): Kit.Element
 	for i, r in state.view.top do
 		local me = r.kid == state.view.kid
 		rows[i] = C.panel({ Size = UDim2.new(1, -px(8), 0, px(44)), LayoutOrder = i }, {
-			rank = C.text({ text = if i <= 3 then ({ "🥇", "🥈", "🥉" })[i] else "#" .. i, size = 18, font = "title", align = "Center", Size = UDim2.fromOffset(px(50), px(44)) }),
-			swatch = e("Frame", { Position = UDim2.fromOffset(px(52), px(14)), Size = UDim2.fromOffset(px(16), px(16)), BackgroundColor3 = Theme.color(r.color) }, { _corner = C.round() }),
+			rank = C.text({
+				text = if i <= 3 then ({ "🥇", "🥈", "🥉" })[i] else "#" .. i,
+				size = 18,
+				font = "title",
+				align = "Center",
+				Size = UDim2.fromOffset(px(50), px(44)),
+			}),
+			swatch = e(
+				"Frame",
+				{
+					Position = UDim2.fromOffset(px(52), px(14)),
+					Size = UDim2.fromOffset(px(16), px(16)),
+					BackgroundColor3 = Theme.color(r.color),
+				},
+				{ _corner = C.round() }
+			),
 			name = C.text({
 				text = (if r.tag then "[" .. r.tag .. "] " else "") .. r.name .. (if r.isBot then "  🤖" else ""),
 				size = 15,
@@ -263,11 +411,26 @@ local function rankingModal(state: any, actions: any): Kit.Element
 				Position = UDim2.fromOffset(px(76), 0),
 				Size = UDim2.new(0.62, -px(76), 1, 0),
 			}),
-			power = C.text({ text = "⚔ " .. Format.thousands(r.power), size = 15, font = "bold", color = "gold", align = "Right", Position = UDim2.fromScale(0.62, 0), Size = UDim2.new(0.38, -px(14), 1, 0) }),
+			power = C.text({
+				text = "⚔ " .. Format.thousands(r.power),
+				size = 15,
+				font = "bold",
+				color = "gold",
+				align = "Right",
+				Position = UDim2.fromScale(0.62, 0),
+				Size = UDim2.new(0.38, -px(14), 1, 0),
+			}),
 		}, if me then "hi" else "flat")
 	end
 	return C.modal("🏆 " .. t("ui.top"), 560, 600, actions.closeModal, {
-		you = C.text({ text = t("ui.rank", { rank = state.view.rank, total = state.view.kingdoms }) .. "  ·  ⚔ " .. Format.thousands(state.view.power), size = 15, font = "bold", color = "muted" }),
+		you = C.text({
+			text = t("ui.rank", { rank = state.view.rank, total = state.view.kingdoms })
+				.. "  ·  ⚔ "
+				.. Format.thousands(state.view.power),
+			size = 15,
+			font = "bold",
+			color = "muted",
+		}),
 		list = C.scroll({ Position = UDim2.fromOffset(0, px(30)), Size = UDim2.new(1, 0, 1, -px(30)) }, rows),
 	})
 end

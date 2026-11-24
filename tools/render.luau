@@ -126,26 +126,29 @@ end
 
 -- The kingdom on camera: a few days into the game.
 local me = Schema.new("Aurelia", 0)
-for id, level in {
-	keep = 9,
-	farm = 9,
-	sawmill = 9,
-	quarry = 8,
-	mine = 7,
-	manor = 6,
-	barracks = 8,
-	wall = 8,
-	infirmary = 6,
-	vault = 5,
-	academy = 5,
-	embassy = 4,
-	warhall = 6,
-	watchtower = 3,
-} do
+for id, level in
+	{
+		keep = 9,
+		farm = 9,
+		sawmill = 9,
+		quarry = 8,
+		mine = 7,
+		manor = 6,
+		barracks = 8,
+		wall = 8,
+		infirmary = 6,
+		vault = 5,
+		academy = 5,
+		embassy = 4,
+		warhall = 6,
+		watchtower = 3,
+	}
+do
 	me.buildings[id] = level
 end
 me.troops = { inf1 = 2400, rng1 = 1900, cav1 = 1200, sie1 = 300, inf2 = 900, rng2 = 650, cav2 = 420, inf3 = 120 }
-me.research = { agriculture = 4, forestry = 3, masonry = 2, surveying = 3, forging = 2, plating = 2, roads = 1, packs = 2 }
+me.research =
+	{ agriculture = 4, forestry = 3, masonry = 2, surveying = 3, forging = 2, plating = 2, roads = 1, packs = 2 }
 me.heroes.kaela = { level = 14, xp = 820 }
 me.heroes.seren = { level = 9, xp = 300 }
 me.heroes.aldric = { level = 17, xp = 1500 }
@@ -186,20 +189,41 @@ local monster = world:nearest(castle.x, castle.y, 40, function(e)
 	return e.kind == "monster"
 end)
 if monster then
-	world:command("u0", "march", { kind = "hunt", x = monster.x, y = monster.y, troops = { inf2 = 600, rng2 = 500, cav1 = 400 }, hero = "kaela" }, t)
+	world:command(
+		"u0",
+		"march",
+		{ kind = "hunt", x = monster.x, y = monster.y, troops = { inf2 = 600, rng2 = 500, cav1 = 400 }, hero = "kaela" },
+		t
+	)
 end
 local node = world:nearest(castle.x, castle.y, 40, function(e)
 	return e.kind == "node" and not e.gatherer and e.res == "ore"
 end)
 if node then
-	world:command("u0", "march", { kind = "gather", x = node.x, y = node.y, troops = { inf1 = 900 }, hero = "seren" }, t)
+	world:command(
+		"u0",
+		"march",
+		{ kind = "gather", x = node.x, y = node.y, troops = { inf1 = 900 }, hero = "seren" },
+		t
+	)
 end
 local target = nearestCastle(function(k)
 	return k.guild ~= mine.guild and k.data.buildings.keep >= 5 and k.data.shieldUntil <= t
 end)
 if target then
 	world.kingdoms[target.kid].data.peaceBroken = true
-	world:command("u0", "march", { kind = "attack", x = target.x, y = target.y, troops = { cav2 = 420, cav1 = 800, inf2 = 300, sie1 = 300 }, hero = "aldric" }, t)
+	world:command(
+		"u0",
+		"march",
+		{
+			kind = "attack",
+			x = target.x,
+			y = target.y,
+			troops = { cav2 = 420, cav1 = 800, inf2 = 300, sie1 = 300 },
+			hero = "aldric",
+		},
+		t
+	)
 end
 advance(t + 900)
 local scoutTarget = nearestCastle(function(k)
@@ -223,7 +247,12 @@ local hunt = world:nearest(castle.x, castle.y, 40, function(e)
 	return e.kind == "monster" and (monster == nil or e.id ~= monster.id)
 end)
 if hunt then
-	world:command("u0", "march", { kind = "hunt", x = hunt.x, y = hunt.y, troops = { rng1 = 800, cav1 = 300 }, hero = "mira" }, t)
+	world:command(
+		"u0",
+		"march",
+		{ kind = "hunt", x = hunt.x, y = hunt.y, troops = { rng1 = 800, cav1 = 300 }, hero = "mira" },
+		t
+	)
 end
 advance(t + 25)
 mine.data.resources.gold = 2350
@@ -372,7 +401,10 @@ for _, scene in scenes do
 	end
 	local tree = App.render(state, noop)
 	local file = "preview/public/scenes/" .. scene.name .. ".json"
-	fs.writeFile(file, serde.encode("json", { width = scene.size[1], height = scene.size[2], root = encode(tree, "Root") }))
+	fs.writeFile(
+		file,
+		serde.encode("json", { width = scene.size[1], height = scene.size[2], root = encode(tree, "Root") })
+	)
 	table.insert(index, { name = scene.name, width = scene.size[1], height = scene.size[2], scale = scene.scale or 1 })
 	print(string.format("  scene %-18s %dx%d", scene.name, scene.size[1], scene.size[2]))
 end
@@ -380,14 +412,16 @@ fs.writeFile("preview/public/scenes/index.json", serde.encode("json", index, tru
 
 -- A few numbers from the photographed realm, for the README.
 local marchCount = #world:marchList()
-print(string.format(
-	"realm: %d kingdoms, %d marches, %d fields, %d monsters, Aurelia power %d (rank %d), troops at home %d",
-	world.kingdomCount,
-	marchCount,
-	world.nodeCount,
-	world.monsterCount,
-	world:power(mine),
-	world:view("u0", t).rank,
-	Army.total(mine.data.troops)
-))
+print(
+	string.format(
+		"realm: %d kingdoms, %d marches, %d fields, %d monsters, Aurelia power %d (rank %d), troops at home %d",
+		world.kingdomCount,
+		marchCount,
+		world.nodeCount,
+		world.monsterCount,
+		world:power(mine),
+		world:view("u0", t).rank,
+		Army.total(mine.data.troops)
+	)
+)
 assert(MapGen.zone(castle.x, castle.y) >= 1)

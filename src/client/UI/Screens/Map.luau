@@ -60,9 +60,23 @@ function Map.visibleChunks(state: any): { number }
 	return out
 end
 
-local DECOR = { forest = { "🌲", 0.55 }, hills = { "⛰️", 0.45 }, lake = { "🌊", 0.2 }, crown = { "✨", 0.12 }, meadow = { "🌼", 0.06 } }
+local DECOR = {
+	forest = { "🌲", 0.55 },
+	hills = { "⛰️", 0.45 },
+	lake = { "🌊", 0.2 },
+	crown = { "✨", 0.12 },
+	meadow = { "🌼", 0.06 },
+}
 
-local function terrain(state: any, actions: any, x0: number, y0: number, x1: number, y1: number, tile: number): Kit.Element
+local function terrain(
+	state: any,
+	actions: any,
+	x0: number,
+	y0: number,
+	x1: number,
+	y1: number,
+	tile: number
+): Kit.Element
 	local seed = state.view.seed
 	local kids: { [any]: any } = {}
 	for y = y0, y1 do
@@ -126,13 +140,38 @@ local function entityElement(state: any, ent: any, tile: number): Kit.Element
 			BackgroundTransparency = 0.15,
 			ZIndex = 4,
 		})
-		kids.level = C.badge(tostring(ent.lv), "panelHi", { Position = UDim2.fromOffset(-px(4), -px(4)), TextSize = px(11), Size = UDim2.fromOffset(px(18), px(18)) })
+		kids.level = C.badge(
+			tostring(ent.lv),
+			"panelHi",
+			{ Position = UDim2.fromOffset(-px(4), -px(4)), TextSize = px(11), Size = UDim2.fromOffset(px(18), px(18)) }
+		)
 		if ent.sh then
-			kids.shield = C.text({ text = "🛡️", size = 14, align = "Center", AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, px(4), 0, -px(4)), Size = UDim2.fromOffset(px(18), px(18)) })
+			kids.shield = C.text({
+				text = "🛡️",
+				size = 14,
+				align = "Center",
+				AnchorPoint = Vector2.new(1, 0),
+				Position = UDim2.new(1, px(4), 0, -px(4)),
+				Size = UDim2.fromOffset(px(18), px(18)),
+			})
 		end
 	elseif ent.k == "n" then
-		kids.icon = C.text({ text = Balance.NODES[ent.r].icon, size = tile * 0.46, align = "Center", Size = UDim2.fromScale(1, 0.8) })
-		kids.level = C.badge(tostring(ent.lv), "bg", { Position = UDim2.fromOffset(px(2), px(2)), TextSize = px(10), Size = UDim2.fromOffset(px(16), px(16)), BackgroundTransparency = 0.25 })
+		kids.icon = C.text({
+			text = Balance.NODES[ent.r].icon,
+			size = tile * 0.46,
+			align = "Center",
+			Size = UDim2.fromScale(1, 0.8),
+		})
+		kids.level = C.badge(
+			tostring(ent.lv),
+			"bg",
+			{
+				Position = UDim2.fromOffset(px(2), px(2)),
+				TextSize = px(10),
+				Size = UDim2.fromOffset(px(16), px(16)),
+				BackgroundTransparency = 0.25,
+			}
+		)
 		kids.bar = e("Frame", {
 			AnchorPoint = Vector2.new(0.5, 1),
 			Position = UDim2.new(0.5, 0, 1, -px(4)),
@@ -140,11 +179,27 @@ local function entityElement(state: any, ent: any, tile: number): Kit.Element
 			BackgroundTransparency = 1,
 		}, { bar = C.progress(ent.a / ent.am, if ent.busy then "orange" else "gold", 5) })
 		if ent.busy then
-			kids.busy = C.text({ text = "⛏️", size = 12, align = "Center", AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -px(2), 0, px(2)), Size = UDim2.fromOffset(px(16), px(16)) })
+			kids.busy = C.text({
+				text = "⛏️",
+				size = 12,
+				align = "Center",
+				AnchorPoint = Vector2.new(1, 0),
+				Position = UDim2.new(1, -px(2), 0, px(2)),
+				Size = UDim2.fromOffset(px(16), px(16)),
+			})
 		end
 	else
-		kids.icon = C.text({ text = Balance.MONSTERS[ent.m].icon, size = tile * 0.5, align = "Center", Size = UDim2.fromScale(1, 0.85) })
-		kids.level = C.badge(tostring(ent.lv), "redDeep", { Position = UDim2.fromOffset(px(2), px(2)), TextSize = px(10), Size = UDim2.fromOffset(px(16), px(16)) })
+		kids.icon = C.text({
+			text = Balance.MONSTERS[ent.m].icon,
+			size = tile * 0.5,
+			align = "Center",
+			Size = UDim2.fromScale(1, 0.85),
+		})
+		kids.level = C.badge(
+			tostring(ent.lv),
+			"redDeep",
+			{ Position = UDim2.fromOffset(px(2), px(2)), TextSize = px(10), Size = UDim2.fromOffset(px(16), px(16)) }
+		)
 		kids.bar = e("Frame", {
 			AnchorPoint = Vector2.new(0.5, 1),
 			Position = UDim2.new(0.5, 0, 1, -px(4)),
@@ -263,8 +318,21 @@ function Map.entityAt(state: any, x: number, y: number): any
 	return state.tileIndex[x .. "_" .. y]
 end
 
-local function actionButton(text: string, variant: string, disabled: boolean, onClick: () -> (), order: number): Kit.Element
-	return C.button({ text = text, variant = variant, disabled = disabled, size = UDim2.new(1, 0, 0, px(42)), LayoutOrder = order, onClick = onClick })
+local function actionButton(
+	text: string,
+	variant: string,
+	disabled: boolean,
+	onClick: () -> (),
+	order: number
+): Kit.Element
+	return C.button({
+		text = text,
+		variant = variant,
+		disabled = disabled,
+		size = UDim2.new(1, 0, 0, px(42)),
+		LayoutOrder = order,
+		onClick = onClick,
+	})
 end
 
 local function selection(state: any, actions: any): Kit.Element?
@@ -283,11 +351,24 @@ local function selection(state: any, actions: any): Kit.Element?
 		title = t("biome." .. biome)
 		local maxZone = 1 + (view.buildings.keep or 1) // 4
 		if biome ~= "lake" then
-			kids.relocate = actionButton(t("ui.relocate", { gold = Balance.RELOCATE_GOLD }), "blue", zone > maxZone, function()
-				actions.relocate(x, y)
-			end, 10)
+			kids.relocate = actionButton(
+				t("ui.relocate", { gold = Balance.RELOCATE_GOLD }),
+				"blue",
+				zone > maxZone,
+				function()
+					actions.relocate(x, y)
+				end,
+				10
+			)
 			if zone > maxZone then
-				kids.note = C.text({ text = t("err.zoneLocked"), size = 13, color = "muted", wrap = true, LayoutOrder = 11, Size = UDim2.new(1, 0, 0, px(34)) })
+				kids.note = C.text({
+					text = t("err.zoneLocked"),
+					size = 13,
+					color = "muted",
+					wrap = true,
+					LayoutOrder = 11,
+					Size = UDim2.new(1, 0, 0, px(34)),
+				})
 			end
 		end
 	elseif ent.k == "c" then
@@ -295,13 +376,16 @@ local function selection(state: any, actions: any): Kit.Element?
 		local mine = ent.kid == view.kid
 		local ally = view.guild ~= nil and ent.gid == view.guild.id
 		kids.info = C.text({
-			text = t("b.keep") .. " " .. t("ui.level", { level = ent.lv }) .. (if ent.bot then " · 🤖 " .. t("ui.bot") else "") .. (if ent.sh then " · 🛡️" else ""),
+			text = t("b.keep") .. " " .. t("ui.level", { level = ent.lv }) .. (if ent.bot
+				then " · 🤖 " .. t("ui.bot")
+				else "") .. (if ent.sh then " · 🛡️" else ""),
 			size = 14,
 			color = "muted",
 			LayoutOrder = 2,
 		})
 		if mine then
-			kids.home = C.text({ text = "⭐ " .. t("ui.you"), size = 16, font = "bold", color = "gold", LayoutOrder = 3 })
+			kids.home =
+				C.text({ text = "⭐ " .. t("ui.you"), size = 16, font = "bold", color = "gold", LayoutOrder = 3 })
 		else
 			kids.scout = actionButton("👁️ " .. t("ui.scout"), "blue", ally, function()
 				actions.openMarch("scout", x, y)
@@ -310,14 +394,29 @@ local function selection(state: any, actions: any): Kit.Element?
 				actions.openMarch("attack", x, y)
 			end, 11)
 			if ent.sh or ally then
-				kids.note = C.text({ text = if ally then t("err.ally") else t("err.shielded"), size = 13, color = "muted", LayoutOrder = 12 })
+				kids.note = C.text({
+					text = if ally then t("err.ally") else t("err.shielded"),
+					size = 13,
+					color = "muted",
+					LayoutOrder = 12,
+				})
 			end
 		end
 	elseif ent.k == "n" then
 		title = t("node." .. ent.r) .. " · " .. t("ui.level", { level = ent.lv })
-		kids.amount = C.text({ text = Balance.RESOURCE_ICONS[ent.r] .. " " .. t("ui.remaining", { v = Format.thousands(ent.a) }), size = 15, font = "bold", LayoutOrder = 2 })
+		kids.amount = C.text({
+			text = Balance.RESOURCE_ICONS[ent.r] .. " " .. t("ui.remaining", { v = Format.thousands(ent.a) }),
+			size = 15,
+			font = "bold",
+			LayoutOrder = 2,
+		})
 		if ent.busy then
-			kids.by = C.text({ text = t("ui.gatheredBy", { name = ent.by or "?" }), size = 14, color = "orange", LayoutOrder = 3 })
+			kids.by = C.text({
+				text = t("ui.gatheredBy", { name = ent.by or "?" }),
+				size = 14,
+				color = "orange",
+				LayoutOrder = 3,
+			})
 		end
 		kids.gather = actionButton("⛏️ " .. t("ui.gather"), "green", ent.busy, function()
 			actions.openMarch("gather", x, y)
@@ -325,12 +424,30 @@ local function selection(state: any, actions: any): Kit.Element?
 	else
 		title = t("mon." .. ent.m) .. " · " .. t("ui.level", { level = ent.lv })
 		kids.hp = e("Frame", { Size = UDim2.new(1, 0, 0, px(18)), BackgroundTransparency = 1, LayoutOrder = 2 }, {
-			bar = C.progress(ent.hp / ent.mhp, "red", 18, t("ui.hp", { v = Format.short(ent.hp), max = Format.short(ent.mhp) })),
+			bar = C.progress(
+				ent.hp / ent.mhp,
+				"red",
+				18,
+				t("ui.hp", { v = Format.short(ent.hp), max = Format.short(ent.mhp) })
+			),
 		})
-		kids.note = C.text({ text = t("ui.monsterHint", { v = Balance.HUNT_STAMINA }), size = 13, color = "muted", wrap = true, LayoutOrder = 3, Size = UDim2.new(1, 0, 0, px(34)) })
-		kids.hunt = actionButton("🏹 " .. t("ui.hunt"), "gold", Live.stamina(view, state.now) < Balance.HUNT_STAMINA, function()
-			actions.openMarch("hunt", x, y)
-		end, 10)
+		kids.note = C.text({
+			text = t("ui.monsterHint", { v = Balance.HUNT_STAMINA }),
+			size = 13,
+			color = "muted",
+			wrap = true,
+			LayoutOrder = 3,
+			Size = UDim2.new(1, 0, 0, px(34)),
+		})
+		kids.hunt = actionButton(
+			"🏹 " .. t("ui.hunt"),
+			"gold",
+			Live.stamina(view, state.now) < Balance.HUNT_STAMINA,
+			function()
+				actions.openMarch("hunt", x, y)
+			end,
+			10
+		)
 	end
 	kids.title = C.text({ text = title, size = 20, font = "title", color = "gold", LayoutOrder = 0 })
 	kids.sub = C.text({ text = subtitle, size = 13, color = "faint", LayoutOrder = 1 })
@@ -379,32 +496,49 @@ function Map.render(state: any, actions: any): Kit.Element
 		ClipsDescendants = true,
 	}, {
 		canvas = canvas,
-		coords = C.panel({ Position = UDim2.fromOffset(px(14), px(14)), Size = UDim2.fromOffset(px(214), px(52)), ZIndex = 20 }, {
-			label = C.text({
-				text = "📍 " .. t("ui.coords", { x = math.floor(state.map.x + 0.5), y = math.floor(state.map.y + 0.5) }),
-				size = 15,
-				font = "bold",
-				Position = UDim2.fromOffset(px(12), px(4)),
-				Size = UDim2.new(1, -px(12), 0, px(22)),
-			}),
-			zone = C.text({
-				text = t("ui.zone", { z = MapGen.zone(math.floor(state.map.x + 0.5), math.floor(state.map.y + 0.5)) }) .. " · " .. t("ui.marches", { used = #state.view.marches, max = state.view.marchSlots }),
-				size = 12,
-				color = "muted",
-				Position = UDim2.fromOffset(px(12), px(26)),
-				Size = UDim2.new(1, -px(12), 0, px(18)),
-			}),
-		}, "flat"),
-		tools = e("Frame", { Position = UDim2.fromOffset(px(14), px(76)), Size = UDim2.fromOffset(px(44), px(150)), BackgroundTransparency = 1, ZIndex = 20 }, {
-			_list = C.list("y", 8),
-			home = C.iconButton("🏠", t("ui.home"), actions.mapHome, 44, { LayoutOrder = 1 }),
-			zoomIn = C.iconButton("＋", "zoom in", function()
-				actions.mapZoom(1)
-			end, 44, { LayoutOrder = 2 }),
-			zoomOut = C.iconButton("－", "zoom out", function()
-				actions.mapZoom(-1)
-			end, 44, { LayoutOrder = 3 }),
-		}),
+		coords = C.panel(
+			{ Position = UDim2.fromOffset(px(14), px(14)), Size = UDim2.fromOffset(px(214), px(52)), ZIndex = 20 },
+			{
+				label = C.text({
+					text = "📍 "
+						.. t("ui.coords", { x = math.floor(state.map.x + 0.5), y = math.floor(state.map.y + 0.5) }),
+					size = 15,
+					font = "bold",
+					Position = UDim2.fromOffset(px(12), px(4)),
+					Size = UDim2.new(1, -px(12), 0, px(22)),
+				}),
+				zone = C.text({
+					text = t(
+						"ui.zone",
+						{ z = MapGen.zone(math.floor(state.map.x + 0.5), math.floor(state.map.y + 0.5)) }
+					) .. " · " .. t("ui.marches", { used = #state.view.marches, max = state.view.marchSlots }),
+					size = 12,
+					color = "muted",
+					Position = UDim2.fromOffset(px(12), px(26)),
+					Size = UDim2.new(1, -px(12), 0, px(18)),
+				}),
+			},
+			"flat"
+		),
+		tools = e(
+			"Frame",
+			{
+				Position = UDim2.fromOffset(px(14), px(76)),
+				Size = UDim2.fromOffset(px(44), px(150)),
+				BackgroundTransparency = 1,
+				ZIndex = 20,
+			},
+			{
+				_list = C.list("y", 8),
+				home = C.iconButton("🏠", t("ui.home"), actions.mapHome, 44, { LayoutOrder = 1 }),
+				zoomIn = C.iconButton("＋", "zoom in", function()
+					actions.mapZoom(1)
+				end, 44, { LayoutOrder = 2 }),
+				zoomOut = C.iconButton("－", "zoom out", function()
+					actions.mapZoom(-1)
+				end, 44, { LayoutOrder = 3 }),
+			}
+		),
 		selection = selection(state, actions),
 		minimap = if Theme.compact then nil else minimap(state, actions),
 	})

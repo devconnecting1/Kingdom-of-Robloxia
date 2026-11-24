@@ -85,24 +85,35 @@ local function topBar(state: any, actions: any): Kit.Element
 		pills[res] = resourcePill(res, resources[res], view.rates[res] or 0, view.cap, i)
 	end
 	local stamina = Live.stamina(view, state.now)
-	pills.stamina = C.panel({ Size = UDim2.fromOffset(px(if Theme.compact then 70 else 92), px(48)), LayoutOrder = 10 }, {
-		icon = C.text({ text = "⚡", size = 20, align = "Center", Size = UDim2.new(0, px(30), 1, 0) }),
-		amount = C.text({
-			text = tostring(stamina),
-			size = 18,
-			font = "title",
-			color = "gold",
-			Position = UDim2.fromOffset(px(30), 0),
-			Size = UDim2.new(1, -px(32), 1, 0),
-		}),
-	}, "flat")
+	pills.stamina = C.panel(
+		{ Size = UDim2.fromOffset(px(if Theme.compact then 70 else 92), px(48)), LayoutOrder = 10 },
+		{
+			icon = C.text({ text = "⚡", size = 20, align = "Center", Size = UDim2.new(0, px(30), 1, 0) }),
+			amount = C.text({
+				text = tostring(stamina),
+				size = 18,
+				font = "title",
+				color = "gold",
+				Position = UDim2.fromOffset(px(30), 0),
+				Size = UDim2.new(1, -px(32), 1, 0),
+			}),
+		},
+		"flat"
+	)
 
 	local shield = nil
 	if view.shielded then
 		shield = C.badge(
-			if view.beginner then "🛡 " .. t("ui.beginner", { level = Balance.BEGINNER_KEEP }) else "🛡 " .. t("ui.shield", { time = Format.duration(view.shieldUntil - state.now) }),
+			if view.beginner
+				then "🛡 " .. t("ui.beginner", { level = Balance.BEGINNER_KEEP })
+				else "🛡 " .. t("ui.shield", { time = Format.duration(view.shieldUntil - state.now) }),
 			"blueDeep",
-			{ Position = UDim2.fromOffset(px(Theme.safeLeft + 84), px(52)), Size = UDim2.fromOffset(0, px(20)), TextSize = px(11), Visible = not Theme.compact }
+			{
+				Position = UDim2.fromOffset(px(Theme.safeLeft + 84), px(52)),
+				Size = UDim2.fromOffset(0, px(20)),
+				TextSize = px(11),
+				Visible = not Theme.compact,
+			}
 		)
 	end
 
@@ -142,7 +153,10 @@ local function topBar(state: any, actions: any): Kit.Element
 			Position = UDim2.fromOffset(px(Theme.safeLeft + 74), px(32)),
 			Size = UDim2.fromOffset(px(220), px(20)),
 			BackgroundTransparency = 1,
-			Text = "⚔ " .. Format.thousands(view.power) .. "   🏆 " .. t("ui.rank", { rank = view.rank, total = view.kingdoms }),
+			Text = "⚔ " .. Format.thousands(view.power) .. "   🏆 " .. t(
+				"ui.rank",
+				{ rank = view.rank, total = view.kingdoms }
+			),
 			TextSize = px(14),
 			Font = Theme.fonts.bold,
 			TextColor3 = Theme.color("gold"),
@@ -159,7 +173,15 @@ local function topBar(state: any, actions: any): Kit.Element
 	})
 end
 
-local function jobRow(icon: string, title: string, job: any, now: number, color: string, actions: any, order: number): Kit.Element
+local function jobRow(
+	icon: string,
+	title: string,
+	job: any,
+	now: number,
+	color: string,
+	actions: any,
+	order: number
+): Kit.Element
 	local left = Live.left(job, now)
 	local free = left <= Balance.FREE_FINISH_SECONDS
 	return e("Frame", { Size = UDim2.new(1, 0, 0, px(58)), BackgroundTransparency = 1, LayoutOrder = order }, {
@@ -201,10 +223,28 @@ local function sidebar(state: any, actions: any): Kit.Element
 		local questKids: { [any]: any } = {
 			_pad = C.padding(12),
 			_list = C.list("y", 6),
-			title = C.text({ text = "📜 " .. t("ui.quest"), size = 14, font = "bold", color = "gold", LayoutOrder = 1 }),
-			body = C.text({ text = t("quest." .. q.id), size = 15, font = "bold", wrap = true, LayoutOrder = 2, Size = UDim2.new(1, 0, 0, px(40)) }),
+			title = C.text({
+				text = "📜 " .. t("ui.quest"),
+				size = 14,
+				font = "bold",
+				color = "gold",
+				LayoutOrder = 1,
+			}),
+			body = C.text({
+				text = t("quest." .. q.id),
+				size = 15,
+				font = "bold",
+				wrap = true,
+				LayoutOrder = 2,
+				Size = UDim2.new(1, 0, 0, px(40)),
+			}),
 			bar = e("Frame", { Size = UDim2.new(1, 0, 0, px(16)), BackgroundTransparency = 1, LayoutOrder = 3 }, {
-				bar = C.progress(q.progress / q.goal, "gold", 16, Format.short(q.progress) .. " / " .. Format.short(q.goal)),
+				bar = C.progress(
+					q.progress / q.goal,
+					"gold",
+					16,
+					Format.short(q.progress) .. " / " .. Format.short(q.goal)
+				),
 			}),
 			reward = e("Frame", { Size = UDim2.new(1, 0, 0, px(28)), BackgroundTransparency = 1, LayoutOrder = 4 }, {
 				row = C.costRow(q.reward),
@@ -219,28 +259,69 @@ local function sidebar(state: any, actions: any): Kit.Element
 				onClick = actions.claimQuest,
 			})
 		end
-		kids.quest = C.panel({ Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = 1 }, questKids, if q.done then "hi" else nil)
+		kids.quest = C.panel(
+			{ Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = 1 },
+			questKids,
+			if q.done then "hi" else nil
+		)
 	end
 
 	-- Queues
 	local queue: { [any]: any } = {
 		_pad = C.padding(12),
 		_list = C.list("y", 6),
-		title = C.text({ text = "🔨 " .. t("ui.builders") .. " " .. #view.builds .. "/" .. view.queueSlots, size = 14, font = "bold", color = "gold", LayoutOrder = 0 }),
+		title = C.text({
+			text = "🔨 " .. t("ui.builders") .. " " .. #view.builds .. "/" .. view.queueSlots,
+			size = 14,
+			font = "bold",
+			color = "gold",
+			LayoutOrder = 0,
+		}),
 	}
 	for i, job in view.builds do
-		queue["b" .. i] = jobRow(Balance.BUILDINGS[job.building].icon, t("b." .. job.building) .. " → " .. job.level, job, now, "blue", actions, i)
+		queue["b" .. i] = jobRow(
+			Balance.BUILDINGS[job.building].icon,
+			t("b." .. job.building) .. " → " .. job.level,
+			job,
+			now,
+			"blue",
+			actions,
+			i
+		)
 	end
 	if #view.builds < view.queueSlots then
-		queue.idle = C.text({ text = t("ui.queueEmpty"), size = 13, color = "muted", wrap = true, LayoutOrder = 9, Size = UDim2.new(1, 0, 0, px(34)) })
+		queue.idle = C.text({
+			text = t("ui.queueEmpty"),
+			size = 13,
+			color = "muted",
+			wrap = true,
+			LayoutOrder = 9,
+			Size = UDim2.new(1, 0, 0, px(34)),
+		})
 	end
 	if view.training then
 		local tr = view.training
-		queue.training = jobRow(Balance.TROOPS[tr.troop].icon, t("ui.training") .. ": " .. tr.count .. " " .. t("t." .. tr.troop), tr, now, "orange", actions, 10)
+		queue.training = jobRow(
+			Balance.TROOPS[tr.troop].icon,
+			t("ui.training") .. ": " .. tr.count .. " " .. t("t." .. tr.troop),
+			tr,
+			now,
+			"orange",
+			actions,
+			10
+		)
 	end
 	if view.researching then
 		local r = view.researching
-		queue.research = jobRow(Balance.RESEARCH[r.tech].icon, t("tech." .. r.tech) .. " → " .. r.level, r, now, "purple", actions, 11)
+		queue.research = jobRow(
+			Balance.RESEARCH[r.tech].icon,
+			t("tech." .. r.tech) .. " → " .. r.level,
+			r,
+			now,
+			"purple",
+			actions,
+			11
+		)
 	end
 	kids.queue = C.panel({ Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = 2 }, queue)
 
@@ -249,11 +330,19 @@ local function sidebar(state: any, actions: any): Kit.Element
 		local marches: { [any]: any } = {
 			_pad = C.padding(12),
 			_list = C.list("y", 6),
-			title = C.text({ text = "🚩 " .. t("ui.marches", { used = #view.marches, max = view.marchSlots }), size = 14, font = "bold", color = "gold", LayoutOrder = 0 }),
+			title = C.text({
+				text = "🚩 " .. t("ui.marches", { used = #view.marches, max = view.marchSlots }),
+				size = 14,
+				font = "bold",
+				color = "gold",
+				LayoutOrder = 0,
+			}),
 		}
 		for i, m in view.incoming do
 			marches["in" .. i] = C.text({
-				text = "⚠ " .. (if m.size then t("ui.incomingSize", { name = m.name, size = m.size }) else t("ui.incoming", { name = m.name })),
+				text = "⚠ " .. (if m.size
+					then t("ui.incomingSize", { name = m.name, size = m.size })
+					else t("ui.incoming", { name = m.name })),
 				size = 13,
 				font = "bold",
 				color = "red",
@@ -265,29 +354,36 @@ local function sidebar(state: any, actions: any): Kit.Element
 		for i, m in view.marches do
 			local leg = m.leg
 			local ends = if m.phase == "work" then m.workEndAt else leg.t1
-			marches["m" .. i] = e("Frame", { Size = UDim2.new(1, 0, 0, px(34)), BackgroundTransparency = 1, LayoutOrder = 10 + i }, {
-				label = C.text({
-					text = t("march." .. m.kind) .. " · " .. t("phase." .. m.phase) .. " " .. Format.duration(ends - now),
-					size = 13,
-					font = "bold",
-					Size = UDim2.new(1, -px(78), 1, 0),
-				}),
-				recall = if m.phase ~= "back"
-					then C.button({
-						text = t("ui.recall"),
-						variant = "red",
-						textSize = 12,
-						size = UDim2.fromOffset(px(72), px(28)),
-						AnchorPoint = Vector2.new(1, 0.5),
-						Position = UDim2.new(1, 0, 0.5, 0),
-						onClick = function()
-							actions.recall(m.id)
-						end,
-					})
-					else nil,
-			})
+			marches["m" .. i] = e(
+				"Frame",
+				{ Size = UDim2.new(1, 0, 0, px(34)), BackgroundTransparency = 1, LayoutOrder = 10 + i },
+				{
+					label = C.text({
+						text = t("march." .. m.kind) .. " · " .. t("phase." .. m.phase) .. " " .. Format.duration(
+							ends - now
+						),
+						size = 13,
+						font = "bold",
+						Size = UDim2.new(1, -px(78), 1, 0),
+					}),
+					recall = if m.phase ~= "back"
+						then C.button({
+							text = t("ui.recall"),
+							variant = "red",
+							textSize = 12,
+							size = UDim2.fromOffset(px(72), px(28)),
+							AnchorPoint = Vector2.new(1, 0.5),
+							Position = UDim2.new(1, 0, 0.5, 0),
+							onClick = function()
+								actions.recall(m.id)
+							end,
+						})
+						else nil,
+				}
+			)
 		end
-		kids.marches = C.panel({ Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = 3 }, marches)
+		kids.marches =
+			C.panel({ Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = 3 }, marches)
 	end
 
 	return C.scroll({
@@ -319,7 +415,13 @@ local function bottomNav(state: any, actions: any): Kit.Element
 			_corner = C.corner(14),
 			_gradient = if active then C.gradient("gold", "goldDeep") else C.gradient("panel2", "panel"),
 			_stroke = C.stroke(if active then "gold" else "line", 1.5, if active then 0 else 0.4),
-			icon = C.text({ text = item.icon, size = 24, align = "Center", Position = UDim2.fromOffset(0, px(4)), Size = UDim2.new(1, 0, 0, px(30)) }),
+			icon = C.text({
+				text = item.icon,
+				size = 24,
+				align = "Center",
+				Position = UDim2.fromOffset(0, px(4)),
+				Size = UDim2.new(1, 0, 0, px(30)),
+			}),
 			label = C.text({
 				text = t("nav." .. item.id),
 				size = 13,
@@ -330,7 +432,11 @@ local function bottomNav(state: any, actions: any): Kit.Element
 				Size = UDim2.new(1, 0, 0, px(18)),
 			}),
 			badge = if count > 0
-				then C.badge(tostring(count), "red", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, px(4), 0, -px(6)) })
+				then C.badge(
+					tostring(count),
+					"red",
+					{ AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, px(4), 0, -px(6)) }
+				)
 				else nil,
 		})
 	end
@@ -350,11 +456,15 @@ local function toasts(state: any): Kit.Element?
 	end
 	local kids: { [any]: any } = { _list = C.list("y", 6, "Center") }
 	for i, toast in state.toasts do
-		kids[i] = C.badge(toast.text, if toast.kind == "error" then "redDeep" elseif toast.kind == "warn" then "orange" else "greenDeep", {
-			Size = UDim2.fromOffset(0, px(34)),
-			TextSize = px(16),
-			Font = Theme.fonts.bold,
-		})
+		kids[i] = C.badge(
+			toast.text,
+			if toast.kind == "error" then "redDeep" elseif toast.kind == "warn" then "orange" else "greenDeep",
+			{
+				Size = UDim2.fromOffset(0, px(34)),
+				TextSize = px(16),
+				Font = Theme.fonts.bold,
+			}
+		)
 	end
 	return e("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0),
@@ -368,8 +478,22 @@ end
 function App.render(state: any, actions: any): Kit.Element
 	if not state.view then
 		return e("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = Theme.color("bg"), BorderSizePixel = 0 }, {
-			title = C.text({ text = "🏰 " .. t("game.title"), size = 40, font = "title", color = "gold", align = "Center", Size = UDim2.fromScale(1, 0.5) }),
-			sub = C.text({ text = t("err.offline"), size = 18, color = "muted", align = "Center", Position = UDim2.fromScale(0, 0.5), Size = UDim2.new(1, 0, 0, px(30)) }),
+			title = C.text({
+				text = "🏰 " .. t("game.title"),
+				size = 40,
+				font = "title",
+				color = "gold",
+				align = "Center",
+				Size = UDim2.fromScale(1, 0.5),
+			}),
+			sub = C.text({
+				text = t("err.offline"),
+				size = 18,
+				color = "muted",
+				align = "Center",
+				Position = UDim2.fromScale(0, 0.5),
+				Size = UDim2.new(1, 0, 0, px(30)),
+			}),
 		})
 	end
 	local screen = ScreenModules[state.screen] or ScreenModules.city

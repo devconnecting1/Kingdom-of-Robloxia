@@ -45,7 +45,9 @@ Theme.zoneTint = { "#5DA34E", "#6EA548", "#8B9D46", "#B79A4E" }
 
 local function hexToRgb(hex: string): (number, number, number)
 	local h = string.gsub(hex, "#", "")
-	return tonumber(string.sub(h, 1, 2), 16) or 0, tonumber(string.sub(h, 3, 4), 16) or 0, tonumber(string.sub(h, 5, 6), 16) or 0
+	return tonumber(string.sub(h, 1, 2), 16) or 0,
+		tonumber(string.sub(h, 3, 4), 16) or 0,
+		tonumber(string.sub(h, 5, 6), 16) or 0
 end
 
 local cache: { [string]: Color3 } = {}

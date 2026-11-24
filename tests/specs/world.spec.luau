@@ -70,7 +70,8 @@ return function(test, expect, load)
 		local world, a = setup()
 		local node = find(world, "node")
 		local troops = { inf1 = 50 }
-		local ok, marchId = world:command("u1", "march", { kind = "gather", x = node.x, y = node.y, troops = troops }, 0)
+		local ok, marchId =
+			world:command("u1", "march", { kind = "gather", x = node.x, y = node.y, troops = troops }, 0)
 		expect.truthy(ok, tostring(marchId))
 		expect.eq(a.data.troops.inf1, Balance.START_TROOPS.inf1 - 50)
 		local m = world.marches[marchId]
@@ -94,7 +95,8 @@ return function(test, expect, load)
 		run(world, 0, 120)
 		expect.truthy(ok1)
 		if node.gatherer then
-			local ok2, err = world:command("u2", "march", { kind = "gather", x = node.x, y = node.y, troops = { inf1 = 10 } }, 120)
+			local ok2, err =
+				world:command("u2", "march", { kind = "gather", x = node.x, y = node.y, troops = { inf1 = 10 } }, 120)
 			expect.errorKey(ok2, err, "err.occupied")
 		end
 	end)
@@ -103,10 +105,20 @@ return function(test, expect, load)
 		local world, a = setup()
 		local monster = find(world, "monster")
 		local hp = monster.hp
-		local ok, id = world:command("u1", "march", { kind = "hunt", x = monster.x, y = monster.y, troops = { inf1 = 100 }, hero = "aldric" }, 0)
+		local ok, id = world:command(
+			"u1",
+			"march",
+			{ kind = "hunt", x = monster.x, y = monster.y, troops = { inf1 = 100 }, hero = "aldric" },
+			0
+		)
 		expect.truthy(ok, tostring(id))
 		expect.eq(a.data.stamina, Balance.STAMINA_MAX - Balance.HUNT_STAMINA)
-		local okBusy, err = world:command("u1", "march", { kind = "hunt", x = monster.x, y = monster.y, troops = { inf1 = 10 }, hero = "aldric" }, 0)
+		local okBusy, err = world:command(
+			"u1",
+			"march",
+			{ kind = "hunt", x = monster.x, y = monster.y, troops = { inf1 = 10 }, hero = "aldric" },
+			0
+		)
 		expect.errorKey(okBusy, err, "err.heroBusy")
 		run(world, 0, 3600)
 		expect.truthy(monster.hp < hp or world.entities[monster.id] == nil)
@@ -118,13 +130,15 @@ return function(test, expect, load)
 	test("beginners cannot be attacked; others can, and both get a report", function()
 		local world, a, b = setup()
 		local castle = world:castleOf(b)
-		local ok, err = world:command("u1", "march", { kind = "attack", x = castle.x, y = castle.y, troops = { inf1 = 100 } }, 0)
+		local ok, err =
+			world:command("u1", "march", { kind = "attack", x = castle.x, y = castle.y, troops = { inf1 = 100 } }, 0)
 		expect.errorKey(ok, err, "err.shielded")
 		b.data.peaceBroken = true
 		b.data.buildings.infirmary = 2
 		a.data.troops.cav1 = 2000
 		a.data.buildings.warhall = 10
-		local ok2, id = world:command("u1", "march", { kind = "attack", x = castle.x, y = castle.y, troops = { cav1 = 2000 } }, 0)
+		local ok2, id =
+			world:command("u1", "march", { kind = "attack", x = castle.x, y = castle.y, troops = { cav1 = 2000 } }, 0)
 		expect.truthy(ok2, tostring(id))
 		expect.truthy(a.data.peaceBroken, "attacking ends beginner protection")
 		local view = world:view("u2", 0)
@@ -144,7 +158,8 @@ return function(test, expect, load)
 		expect.truthy(world:command("u1", "guildJoin", { guild = 1 }, 0))
 		expect.truthy(world:command("u2", "guildJoin", { guild = 1 }, 0))
 		local castle = world:castleOf(b)
-		local ok, err = world:command("u1", "march", { kind = "attack", x = castle.x, y = castle.y, troops = { inf1 = 10 } }, 0)
+		local ok, err =
+			world:command("u1", "march", { kind = "attack", x = castle.x, y = castle.y, troops = { inf1 = 10 } }, 0)
 		expect.errorKey(ok, err, "err.ally")
 	end)
 
@@ -168,7 +183,8 @@ return function(test, expect, load)
 	test("recalling brings troops home early", function()
 		local world, a = setup()
 		local node = find(world, "node")
-		local _, id = world:command("u1", "march", { kind = "gather", x = node.x, y = node.y, troops = { rng1 = 30 } }, 0)
+		local _, id =
+			world:command("u1", "march", { kind = "gather", x = node.x, y = node.y, troops = { rng1 = 30 } }, 0)
 		local m = world.marches[id]
 		local half = m.leg.t1 / 2
 		run(world, 0, half)

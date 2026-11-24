@@ -126,11 +126,7 @@ function C.panel(props: { [string]: any }?, children: { [any]: any }?, style: st
 	if style ~= "flat" then
 		kids._gradient = if style == "hi" then C.gradient("panelHi", "panel") else C.gradient("panel2", "panel")
 	end
-	return e(
-		"Frame",
-		C.merge({ BackgroundColor3 = Color3.fromRGB(255, 255, 255), BorderSizePixel = 0 }, props),
-		kids
-	)
+	return e("Frame", C.merge({ BackgroundColor3 = Color3.fromRGB(255, 255, 255), BorderSizePixel = 0 }, props), kids)
 end
 
 local VARIANTS = {
@@ -177,7 +173,13 @@ function C.button(p: ButtonProps): Kit.Element
 	})
 end
 
-function C.iconButton(icon: string, label: string, onClick: (() -> ())?, size: number?, props: { [string]: any }?): Kit.Element
+function C.iconButton(
+	icon: string,
+	label: string,
+	onClick: (() -> ())?,
+	size: number?,
+	props: { [string]: any }?
+): Kit.Element
 	local s = size or 44
 	return e(
 		"TextButton",
@@ -259,7 +261,12 @@ function C.costItem(res: string, amount: number, have: number?): Kit.Element
 		_corner = C.corner(8),
 		_pad = C.padding(0, 8, 0, 6),
 		_list = C.list("x", 4, "Left", "Center"),
-		icon = C.text({ text = Balance.RESOURCE_ICONS[res], size = 15, Size = UDim2.fromOffset(px(20), px(26)), align = "Center" }),
+		icon = C.text({
+			text = Balance.RESOURCE_ICONS[res],
+			size = 15,
+			Size = UDim2.fromOffset(px(20), px(26)),
+			align = "Center",
+		}),
 		amount = C.text({
 			text = Format.short(amount),
 			size = 15,

@@ -221,7 +221,14 @@ function Store.actions(state: State, send: (string, any) -> any, changed: () -> 
 				end
 			end
 		end
-		state.modal = { kind = "march", march = kind, x = x, y = y, troops = troops, hero = if kind == "scout" then nil else hero }
+		state.modal = {
+			kind = "march",
+			march = kind,
+			x = x,
+			y = y,
+			troops = troops,
+			hero = if kind == "scout" then nil else hero,
+		}
 		changed()
 	end
 

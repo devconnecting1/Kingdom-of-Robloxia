@@ -151,7 +151,10 @@ local function onCommand(player: Player, name: any, payload: any): any
 	if ok then
 		return { ok = true, result = if type(result) == "table" then nil else result }
 	end
-	return { ok = false, err = if type(result) == "string" and string.sub(result, 1, 4) == "err." then result else "err.unknown" }
+	return {
+		ok = false,
+		err = if type(result) == "string" and string.sub(result, 1, 4) == "err." then result else "err.unknown",
+	}
 end
 
 local function onPlayerAdded(player: Player)

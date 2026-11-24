@@ -75,7 +75,10 @@ function City.settle(data: any, now: number): { Event }
 		data.research[researching.tech] = researching.level
 		data.stats.researched += 1
 		data.researching = nil
-		table.insert(events, { kind = "researched", tech = researching.tech, level = researching.level, id = researching.id })
+		table.insert(
+			events,
+			{ kind = "researched", tech = researching.tech, level = researching.level, id = researching.id }
+		)
 	end
 	return events
 end

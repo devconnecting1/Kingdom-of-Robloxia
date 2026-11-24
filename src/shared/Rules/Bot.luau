@@ -15,10 +15,70 @@ Bot.PERSONALITIES = { "builder", "raider", "gatherer", "hunter" }
 
 -- Building priorities per personality; the bot upgrades the first one it can afford.
 local PRIORITIES = {
-	builder = { "farm", "sawmill", "keep", "wall", "quarry", "manor", "academy", "mine", "vault", "barracks", "embassy", "warhall", "infirmary", "watchtower" },
-	raider = { "barracks", "keep", "wall", "warhall", "farm", "sawmill", "infirmary", "quarry", "mine", "academy", "manor", "watchtower", "vault", "embassy" },
-	gatherer = { "farm", "sawmill", "quarry", "keep", "wall", "mine", "vault", "warhall", "manor", "academy", "barracks", "embassy", "infirmary", "watchtower" },
-	hunter = { "keep", "wall", "barracks", "farm", "sawmill", "warhall", "academy", "quarry", "mine", "infirmary", "manor", "vault", "embassy", "watchtower" },
+	builder = {
+		"farm",
+		"sawmill",
+		"keep",
+		"wall",
+		"quarry",
+		"manor",
+		"academy",
+		"mine",
+		"vault",
+		"barracks",
+		"embassy",
+		"warhall",
+		"infirmary",
+		"watchtower",
+	},
+	raider = {
+		"barracks",
+		"keep",
+		"wall",
+		"warhall",
+		"farm",
+		"sawmill",
+		"infirmary",
+		"quarry",
+		"mine",
+		"academy",
+		"manor",
+		"watchtower",
+		"vault",
+		"embassy",
+	},
+	gatherer = {
+		"farm",
+		"sawmill",
+		"quarry",
+		"keep",
+		"wall",
+		"mine",
+		"vault",
+		"warhall",
+		"manor",
+		"academy",
+		"barracks",
+		"embassy",
+		"infirmary",
+		"watchtower",
+	},
+	hunter = {
+		"keep",
+		"wall",
+		"barracks",
+		"farm",
+		"sawmill",
+		"warhall",
+		"academy",
+		"quarry",
+		"mine",
+		"infirmary",
+		"manor",
+		"vault",
+		"embassy",
+		"watchtower",
+	},
 }
 
 local CLASS_FOR = {
@@ -182,7 +242,13 @@ function Bot.tick(world: any, kid: string, now: number, rng: Rng.Rng)
 		end)
 		if monster and Army.total(troops) > 0 then
 			if
-				tryCommand(world, kid, "march", { kind = "hunt", x = monster.x, y = monster.y, troops = troops, hero = hero }, now)
+				tryCommand(
+					world,
+					kid,
+					"march",
+					{ kind = "hunt", x = monster.x, y = monster.y, troops = troops, hero = hero },
+					now
+				)
 			then
 				free -= 1
 			end
@@ -205,7 +271,13 @@ function Bot.tick(world: any, kid: string, now: number, rng: Rng.Rng)
 		if target then
 			local troops = pickTroops(data, 0.7)
 			if
-				tryCommand(world, kid, "march", { kind = "attack", x = target.x, y = target.y, troops = troops, hero = freeHero(world, k) }, now)
+				tryCommand(
+					world,
+					kid,
+					"march",
+					{ kind = "attack", x = target.x, y = target.y, troops = troops, hero = freeHero(world, k) },
+					now
+				)
 			then
 				free -= 1
 			end
@@ -220,7 +292,13 @@ function Bot.tick(world: any, kid: string, now: number, rng: Rng.Rng)
 			return e.kind == "node" and not e.gatherer and (anyKind or e.res == want)
 		end)
 		if node then
-			tryCommand(world, kid, "march", { kind = "gather", x = node.x, y = node.y, troops = pickTroops(data, 0.4) }, now)
+			tryCommand(
+				world,
+				kid,
+				"march",
+				{ kind = "gather", x = node.x, y = node.y, troops = pickTroops(data, 0.4) },
+				now
+			)
 		end
 	end
 end

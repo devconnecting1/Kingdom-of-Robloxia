@@ -107,7 +107,8 @@ end
 mountNode = function(element: Element, parent: Instance, key: any): Node
 	local instance = Instance.new(element.class :: any)
 	instance.Name = childName(key)
-	local node: Node = { key = key, element = element, instance = instance, handlers = {}, connections = {}, children = {} }
+	local node: Node =
+		{ key = key, element = element, instance = instance, handlers = {}, connections = {}, children = {} }
 	if type(key) == "number" and instance:IsA("GuiObject") and element.props.LayoutOrder == nil then
 		(instance :: GuiObject).LayoutOrder = key
 	end

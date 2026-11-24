@@ -51,7 +51,15 @@ return function(test, expect, load)
 
 	test("50 kingdoms play two hours without breaking an invariant", function()
 		local world, avg, worst = simulate(2024, 7200)
-		print(string.format("    avg step %.2f ms, worst %.2f ms, %d marches out, %d entities", avg * 1000, worst * 1000, #world:marchList(), world.nodeCount + world.monsterCount))
+		print(
+			string.format(
+				"    avg step %.2f ms, worst %.2f ms, %d marches out, %d entities",
+				avg * 1000,
+				worst * 1000,
+				#world:marchList(),
+				world.nodeCount + world.monsterCount
+			)
+		)
 		expect.eq(world.kingdomCount, 50)
 		local attacks, hunts, gathers, built = 0, 0, 0, 0
 		for _, k in world.kingdoms do

@@ -40,11 +40,20 @@ local function techCard(state: any, actions: any, id: string, order: number): Ki
 		status = C.text({ text = "⭐ " .. t("ui.maxed"), size = 13, font = "bold", color = "gold", LayoutOrder = 4 })
 	elseif running then
 		status = e("Frame", { Size = UDim2.new(1, 0, 0, px(18)), BackgroundTransparency = 1, LayoutOrder = 4 }, {
-			bar = C.progress(Live.fraction(view.researching, state.now), "purple", 18, Format.duration(Live.left(view.researching, state.now))),
+			bar = C.progress(
+				Live.fraction(view.researching, state.now),
+				"purple",
+				18,
+				Format.duration(Live.left(view.researching, state.now))
+			),
 		})
 	else
 		status = e("Frame", { Size = UDim2.new(1, 0, 0, px(34)), BackgroundTransparency = 1, LayoutOrder = 4 }, {
-			cost = e("Frame", { Size = UDim2.new(1, -px(92), 1, 0), BackgroundTransparency = 1 }, { row = C.costRow(cost, resources) }),
+			cost = e(
+				"Frame",
+				{ Size = UDim2.new(1, -px(92), 1, 0), BackgroundTransparency = 1 },
+				{ row = C.costRow(cost, resources) }
+			),
 			go = C.button({
 				text = "⏱ " .. Format.duration(Economy.researchTime(data, id, nextLevel)),
 				variant = "blue",
@@ -65,7 +74,13 @@ local function techCard(state: any, actions: any, id: string, order: number): Ki
 		_list = C.list("y", 6),
 		head = e("Frame", { Size = UDim2.new(1, 0, 0, px(28)), BackgroundTransparency = 1, LayoutOrder = 1 }, {
 			icon = C.text({ text = def.icon, size = 22, Size = UDim2.fromOffset(px(30), px(28)) }),
-			name = C.text({ text = t("tech." .. id), size = 17, font = "title", Position = UDim2.fromOffset(px(32), 0), Size = UDim2.new(1, -px(90), 1, 0) }),
+			name = C.text({
+				text = t("tech." .. id),
+				size = 17,
+				font = "title",
+				Position = UDim2.fromOffset(px(32), 0),
+				Size = UDim2.new(1, -px(90), 1, 0),
+			}),
 			level = C.badge(level .. "/" .. def.maxLevel, if maxed then "goldDeep" else "panelHi", {
 				AnchorPoint = Vector2.new(1, 0.5),
 				Position = UDim2.new(1, 0, 0.5, 0),
@@ -73,23 +88,28 @@ local function techCard(state: any, actions: any, id: string, order: number): Ki
 			}),
 		}),
 		bonus = C.text({
-			text = t("stat." .. def.stat, { v = Format.percent(def.perLevel * math.max(level, 1)) }) .. (if level == 0 then " (" .. t("ui.level", { level = 1 }) .. ")" else ""),
+			text = t("stat." .. def.stat, { v = Format.percent(def.perLevel * math.max(level, 1)) })
+				.. (if level == 0 then " (" .. t("ui.level", { level = 1 }) .. ")" else ""),
 			size = 13,
 			color = if level > 0 then "green" else "muted",
 			font = "bold",
 			LayoutOrder = 2,
 		}),
-		dots = e("Frame", { Size = UDim2.new(1, 0, 0, px(8)), BackgroundTransparency = 1, LayoutOrder = 3 }, (function()
-			local dots: { [any]: any } = { _list = C.list("x", 4) }
-			for i = 1, def.maxLevel do
-				dots[i] = e("Frame", {
-					Size = UDim2.new(1 / def.maxLevel, -px(4), 1, 0),
-					BackgroundColor3 = Theme.color(if i <= level then "purple" else "bg"),
-					BorderSizePixel = 0,
-				}, { _corner = C.round() })
-			end
-			return dots
-		end)()),
+		dots = e(
+			"Frame",
+			{ Size = UDim2.new(1, 0, 0, px(8)), BackgroundTransparency = 1, LayoutOrder = 3 },
+			(function()
+				local dots: { [any]: any } = { _list = C.list("x", 4) }
+				for i = 1, def.maxLevel do
+					dots[i] = e("Frame", {
+						Size = UDim2.new(1 / def.maxLevel, -px(4), 1, 0),
+						BackgroundColor3 = Theme.color(if i <= level then "purple" else "bg"),
+						BorderSizePixel = 0,
+					}, { _corner = C.round() })
+				end
+				return dots
+			end)()
+		),
 		status = status,
 	}, if running then "hi" else nil)
 end
@@ -129,12 +149,18 @@ function Academy.render(state: any, actions: any): Kit.Element
 			Size = UDim2.new(1, 0, 0, px(34)),
 		}),
 		sub = C.text({
-			text = if academy < 1 then t("ui.locked", { level = Balance.BUILDINGS.academy.unlockKeep }) else t("ui.academyHint"),
+			text = if academy < 1
+				then t("ui.locked", { level = Balance.BUILDINGS.academy.unlockKeep })
+				else t("ui.academyHint"),
 			size = 14,
 			color = "muted",
 			Position = UDim2.fromOffset(0, px(36)),
 		}),
-		cols = e("Frame", { Position = UDim2.fromOffset(0, px(68)), Size = UDim2.new(1, 0, 1, -px(68)), BackgroundTransparency = 1 }, columns),
+		cols = e(
+			"Frame",
+			{ Position = UDim2.fromOffset(0, px(68)), Size = UDim2.new(1, 0, 1, -px(68)), BackgroundTransparency = 1 },
+			columns
+		),
 	})
 end
 
