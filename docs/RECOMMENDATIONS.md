@@ -26,17 +26,21 @@
 
 1. **Arte própria:** ícones e molduras 9-slice (ImageLabel com `SliceCenter`) no lugar dos emojis. A UI já isola tudo
    em `Components.luau`, então a troca é localizada.
-2. **Reinos persistentes:** hoje o mapa e as guildas vivem enquanto o servidor vive. O próximo passo é um reino
-   persistente por servidor reservado (`TeleportService:ReserveServer`) com o estado do mapa no DataStore e um
-   lobby que escolhe o reino. As regras já são puras, então só a camada de servidor muda.
-3. **Rally de guilda** (vários membros atacam juntos) e **eventos** (monstro chefe nas Terras da Coroa).
-4. **Analytics** com `AnalyticsService` (funil das missões, tempo até Fortaleza 5) para balancear com dados.
-5. **Som e animações** com `TweenService` (já há espaço no `Kit` para um prop de animação).
-6. **Sorteio de reino** por nível de Fortaleza, para iniciantes não caírem com veteranos.
-7. **Testes de UI** comparando screenshots entre PRs (diferença visual) usando os artefatos do CI.
+2. **Migração entre reinos** (com limite de poder, uma vez por temporada) e **Guerra de Reinos**: eventos em que dois
+   reinos se enfrentam num mapa temporário (via `MessagingService` e um servidor reservado só para o evento).
+3. **Castelo da Coroa:** a guilda que dominar as Terras da Coroa (centro) por X horas dá o título de Rei ao líder,
+   com bônus para o reino inteiro. É o "objetivo final" do gênero e cria política entre guildas.
+4. **Inativos:** depois de 30 dias offline com Fortaleza baixa, guardar o reino do jogador no perfil dele e liberar
+   a vaga no mapa; ao voltar, ele reaparece com tudo.
+5. **Rally de guilda** (vários membros atacam juntos) e **eventos** (monstro chefe nas Terras da Coroa).
+6. **Analytics** com `AnalyticsService` (funil das missões, tempo até Fortaleza 5) para balancear com dados.
+7. **Som e animações** com `TweenService` (já há espaço no `Kit` para um prop de animação).
+8. **Sorteio de reino** por nível de Fortaleza, para iniciantes não caírem com veteranos.
+9. **Testes de UI** comparando screenshots entre PRs (diferença visual) usando os artefatos do CI.
 
 ## Limites conhecidos desta versão
 
 - As screenshots são renderizadas no navegador a partir da árvore real da UI; fontes e emojis são equivalentes web.
 - O mapa usa emojis como ícones; em alguns dispositivos Roblox os emojis podem aparecer com estilo do sistema.
-- Guildas e mapa não persistem entre servidores (ver item 2 acima).
+- Um reino tem no máximo 20 jogadores online ao mesmo tempo (limite de um servidor Roblox); membros podem ser 70.
+- Se a gravação final de um servidor falhar (queda da plataforma), perde-se no máximo o último minuto do reino.

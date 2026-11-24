@@ -5,7 +5,9 @@ você constrói seu castelo, treina exércitos, recruta heróis, pesquisa tecnol
 mapa, entra em guildas e ataca outros reinos. O gênero é o dos MMOs de estratégia de reinos para celular; o jogo,
 os nomes, os heróis e os números são originais.
 
-- **Até 50 reinos por servidor:** 20 jogadores reais + 30 bots que jogam com as mesmas regras.
+- **Reinos persistentes, como nos jogos mobile:** seu castelo fica sempre no mesmo reino, com os mesmos vizinhos,
+  bots e guildas, mesmo offline. Quando um reino enche, o próximo abre sozinho. [Como funciona](#reinos-persistentes).
+- **Até 20 jogadores online por reino** (até 70 membros) e bots que dão lugar aos humanos (30 → 10).
 - **Mapa médio de 96×96** em 4 zonas concêntricas (as do centro têm campos mais ricos e monstros mais fortes).
 - **Servidor autoritativo:** toda regra roda no servidor; o cliente só mostra o estado e envia ordens validadas.
 - **Português e inglês** (escolhido pelo idioma da conta Roblox).
@@ -35,6 +37,38 @@ não um print do Roblox Studio.
 
 Celular (layout compacto) e inglês: [`12-phone-kingdom`](docs/screenshots/12-phone-kingdom.png),
 [`13-phone-map`](docs/screenshots/13-phone-map.png), [`11-kingdom-en`](docs/screenshots/11-kingdom-en.png).
+
+## Reinos persistentes
+
+Nos jogos de reino para celular, o desenvolvedor abre o "Servidor 1", deixa ele encher e só então abre o "Servidor 2";
+seu castelo nunca sai do servidor onde nasceu. No Roblox, servidores são temporários: nascem quando alguém entra e
+morrem quando o último sai. A solução aqui separa **o reino** (que é permanente) **do servidor** (que só o executa):
+
+```
+Jogador entra no jogo ──► servidor público = LOBBY
+                            │  lê "u_<id>" → reino de origem (ou escolhe o reino mais novo aberto)
+                            │  se todos os reinos estão cheios: ReserveServer → abre o Reino #N+1
+                            ▼
+                     servidor reservado do Reino #N  (sempre o mesmo código de acesso)
+                            │  pega a "posse" do reino no MemoryStore (um único servidor escreve)
+                            │  carrega o mapa inteiro do DataStore e "alcança" o tempo que passou
+                            │  salva a cada 60 s e ao fechar
+                            ▼
+                     DataStore  realm_<N>: todos os castelos, bots, guildas, campos, monstros, marchas
+```
+
+- **Seu castelo nunca some:** ao sair, ele continua no mapa (💤 offline), produzindo, com as marchas em andamento, e
+  pode ser atacado ou espionado (com o escudo de iniciante e o de 10 min após derrota). Ao voltar, os relatórios do
+  que aconteceu estão lá.
+- **O tempo corre mesmo sem ninguém no servidor:** ao carregar, as obras terminadas são concluídas, a produção é
+  somada e cada marcha é resolvida no instante exato em que chegaria.
+- **Novos reinos abrem sozinhos:** o reino mais novo recebe jogadores novos até 60 membros; depois o lobby abre o
+  próximo. Amigos ainda podem entrar até 70. Todos os jogadores de um reino ficam juntos para sempre.
+- **Bots dão lugar a humanos:** um reino novo começa com 30 bots; a cada 2 membros humanos sai o bot mais fraco, até
+  sobrarem 10, para o mapa nunca parecer vazio.
+- **Limite do Roblox:** 20 jogadores **online ao mesmo tempo** por reino (um servidor). Se mais gente tentar entrar
+  no mesmo minuto, o excedente espera no lobby e tenta de novo (como uma fila de servidor cheio).
+- **No Studio** o jogo roda um reino local (sem lobby) e, sem acesso a API, em memória.
 
 ## Como se joga
 
@@ -73,7 +107,7 @@ Detalhes em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) e as recomendações 
 |---|---|---|
 | **CI** | push e pull request | StyLua (formato), Selene (lint), luau-lsp (tipos estritos), testes Lune, `rojo build` do `.rbxl`, Prettier + ESLint + TypeScript do preview, screenshots (artefatos `place` e `screenshots`) |
 | **Autofix** | push em `claude/**` e `feature/**` | formata Luau e TypeScript, regenera `docs/screenshots/` e faz commit no branch |
-| **Deploy** | push na `main` (versão *Saved*) ou manual (*Saved* ou *Published*) | roda os testes, gera o place e publica via Open Cloud; define o tamanho do servidor para 20 |
+| **Deploy** | push na `main` (versão *Saved*) ou manual (*Saved* ou *Published*) | roda os testes, gera o place e publica via Open Cloud no universo `10548333977`, place `116364339053967`; define o tamanho do servidor para 20 |
 
 Ferramentas fixadas em [`rokit.toml`](rokit.toml): Rojo, StyLua, Selene, Lune e luau-lsp.
 

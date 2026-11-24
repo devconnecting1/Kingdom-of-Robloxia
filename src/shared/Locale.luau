@@ -6,6 +6,16 @@ local Locale = {}
 
 local en: { [string]: string } = {
 	["game.title"] = "Kingdom of Robloxia",
+	["lobby.finding"] = "Finding your realm…",
+	["lobby.loading"] = "Loading realm #{realm}…",
+	["lobby.teleporting"] = "Travelling to realm #{realm}…",
+	["lobby.ready"] = "Welcome back!",
+	["lobby.full"] = "Your realm has 20 players online right now. Trying again in a moment…",
+	["lobby.moving"] = "Taking you to your own realm…",
+	["lobby.error"] = "The realm could not be reached. Trying again…",
+	["lobby.hint"] = "Your castle always stays in the same realm, with the same neighbours, even while you are away.",
+	["ui.realm"] = "Realm #{n}",
+	["ui.offline"] = "Offline",
 
 	["res.food"] = "Food",
 	["res.wood"] = "Wood",
@@ -326,6 +336,16 @@ local en: { [string]: string } = {
 
 local pt: { [string]: string } = {
 	["game.title"] = "Reino de Robloxia",
+	["lobby.finding"] = "Procurando o seu reino…",
+	["lobby.loading"] = "Carregando o reino #{realm}…",
+	["lobby.teleporting"] = "Viajando para o reino #{realm}…",
+	["lobby.ready"] = "Bem-vindo de volta!",
+	["lobby.full"] = "Seu reino está com 20 jogadores online agora. Tentando de novo em instantes…",
+	["lobby.moving"] = "Levando você para o seu reino…",
+	["lobby.error"] = "Não foi possível chegar ao reino. Tentando de novo…",
+	["lobby.hint"] = "Seu castelo fica sempre no mesmo reino, com os mesmos vizinhos, mesmo enquanto você está fora.",
+	["ui.realm"] = "Reino #{n}",
+	["ui.offline"] = "Offline",
 
 	["res.food"] = "Comida",
 	["res.wood"] = "Madeira",

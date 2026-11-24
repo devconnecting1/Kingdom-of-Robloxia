@@ -167,6 +167,15 @@ local function entityElement(state: any, ent: any, tile: number): Kit.Element
 			"panelHi",
 			{ Position = UDim2.fromOffset(-px(4), -px(4)), TextSize = px(11), Size = UDim2.fromOffset(px(18), px(18)) }
 		)
+		if ent.off and not ent.bot then
+			kids.sleep = C.text({
+				text = "💤",
+				size = 14,
+				align = "Center",
+				Position = UDim2.fromOffset(px(2), px(14)),
+				Size = UDim2.fromOffset(px(18), px(18)),
+			})
+		end
 		if ent.sh then
 			kids.shield = C.text({
 				text = "🛡️",
@@ -397,6 +406,7 @@ local function selection(state: any, actions: any): Kit.Element?
 		kids.info = C.text({
 			text = t("b.keep") .. " " .. t("ui.level", { level = ent.lv }) .. (if ent.bot
 				then " · 🤖 " .. t("ui.bot")
+				elseif ent.off then " · 💤 " .. t("ui.offline")
 				else "") .. (if ent.sh then " · 🛡️" else ""),
 			size = 14,
 			color = "muted",

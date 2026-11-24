@@ -42,9 +42,8 @@ gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = player:WaitForChild("PlayerGui")
 
-local net = ReplicatedStorage:WaitForChild("KoRNet")
-local commandRemote = net:WaitForChild(Protocol.REMOTE_COMMAND) :: RemoteFunction
-local pushRemote = net:WaitForChild(Protocol.REMOTE_PUSH) :: RemoteEvent
+-- In the lobby there is no KoRNet: the server only reports progress through attributes while it finds the realm.
+local commandRemote: RemoteFunction? = nil
 
 local state = Store.initialState()
 local dirty = true
@@ -53,8 +52,12 @@ local function changed()
 end
 
 local function send(name: string, payload: any): any
+	local remote = commandRemote
+	if not remote then
+		return { ok = false, err = "err.offline" }
+	end
 	local ok, reply = pcall(function()
-		return commandRemote:InvokeServer(name, payload)
+		return remote:InvokeServer(name, payload)
 	end)
 	if not ok then
 		return { ok = false, err = "err.offline" }
@@ -66,7 +69,7 @@ local actions = Store.actions(state, send, changed)
 
 -- Toast params carry ids; turn them into names in the player's language.
 local PARAM_PREFIX = { building = "b.", troop = "t.", tech = "tech." }
-pushRemote.OnClientEvent:Connect(function(topic: string, a: any, b: any)
+local function onPush(topic: string, a: any, b: any)
 	if topic == "view" then
 		state.view = a
 	elseif topic == "chunk" then
@@ -83,7 +86,15 @@ pushRemote.OnClientEvent:Connect(function(topic: string, a: any, b: any)
 		actions.toast(Locale.t(a, params), if a == "toast.incoming" or a == "toast.defeated" then "warn" else "info")
 	end
 	changed()
-end)
+end
+
+local function readStatus()
+	state.status = { key = player:GetAttribute("KoRStatus") or "lobby.finding", realm = player:GetAttribute("KoRRealm") }
+	changed()
+end
+player:GetAttributeChangedSignal("KoRStatus"):Connect(readStatus)
+player:GetAttributeChangedSignal("KoRRealm"):Connect(readStatus)
+readStatus()
 
 -- Viewport and safe area ------------------------------------------------------------------------------------------------
 
@@ -198,6 +209,10 @@ end
 local root = Kit.mount(App.render(state, actions), gui, "Root")
 
 task.spawn(function()
+	local net = ReplicatedStorage:WaitForChild("KoRNet", math.huge) :: Folder
+	local pushRemote = net:WaitForChild(Protocol.REMOTE_PUSH) :: RemoteEvent
+	pushRemote.OnClientEvent:Connect(onPush)
+	commandRemote = net:WaitForChild(Protocol.REMOTE_COMMAND) :: RemoteFunction
 	while not state.view do
 		local reply = send("hello", {})
 		if reply and reply.ok then

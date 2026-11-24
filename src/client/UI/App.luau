@@ -151,12 +151,13 @@ local function topBar(state: any, actions: any): Kit.Element
 		}),
 		power = e("TextButton", {
 			Position = UDim2.fromOffset(px(Theme.safeLeft + 74), px(32)),
-			Size = UDim2.fromOffset(px(220), px(20)),
+			Size = UDim2.fromOffset(px(420), px(20)),
 			BackgroundTransparency = 1,
-			Text = "⚔ " .. Format.thousands(view.power) .. "   🏆 " .. t(
-				"ui.rank",
-				{ rank = view.rank, total = view.kingdoms }
-			),
+			Text = "⚔ "
+				.. Format.thousands(view.power)
+				.. "   🏆 "
+				.. t("ui.rank", { rank = view.rank, total = view.kingdoms })
+				.. (if view.realm and view.realm > 0 then "   🌍 " .. t("ui.realm", { n = view.realm }) else ""),
 			TextSize = px(14),
 			Font = Theme.fonts.bold,
 			TextColor3 = Theme.color("gold"),
@@ -477,22 +478,35 @@ end
 
 function App.render(state: any, actions: any): Kit.Element
 	if not state.view then
+		local status = state.status or { key = "lobby.finding" }
 		return e("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = Theme.color("bg"), BorderSizePixel = 0 }, {
+			_gradient = C.gradient("bg2", "bg"),
 			title = C.text({
 				text = "🏰 " .. t("game.title"),
-				size = 40,
+				size = 44,
 				font = "title",
 				color = "gold",
 				align = "Center",
-				Size = UDim2.fromScale(1, 0.5),
+				Position = UDim2.fromScale(0, 0.3),
+				Size = UDim2.new(1, 0, 0, px(56)),
 			}),
 			sub = C.text({
-				text = t("err.offline"),
-				size = 18,
+				text = t(status.key, { realm = status.realm or "?" }),
+				size = 20,
+				font = "bold",
+				align = "Center",
+				Position = UDim2.new(0, 0, 0.3, px(70)),
+				Size = UDim2.new(1, 0, 0, px(30)),
+			}),
+			hint = C.text({
+				text = t("lobby.hint"),
+				size = 15,
 				color = "muted",
 				align = "Center",
-				Position = UDim2.fromScale(0, 0.5),
-				Size = UDim2.new(1, 0, 0, px(30)),
+				wrap = true,
+				AnchorPoint = Vector2.new(0.5, 0),
+				Position = UDim2.new(0.5, 0, 0.3, px(116)),
+				Size = UDim2.fromOffset(px(640), px(60)),
 			}),
 		})
 	end

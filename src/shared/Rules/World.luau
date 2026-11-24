@@ -13,6 +13,7 @@ local Economy = require(script.Parent.Economy)
 local MapGen = require(script.Parent.MapGen)
 local Protocol = require(script.Parent.Protocol)
 local Rng = require(script.Parent.Rng)
+local Schema = require(script.Parent.Schema)
 
 local World = {}
 World.__index = World
@@ -28,9 +29,11 @@ local function key(x: number, y: number): number
 	return x + y * SIZE
 end
 
-function World.new(seed: number, now: number): World
+-- An empty world: no entities, no guilds. `new` fills it; `restore` loads a saved one into it.
+local function blank(seed: number, now: number): World
 	local self = setmetatable({
 		seed = seed,
+		realmId = 0,
 		rng = Rng.new(seed),
 		entities = {},
 		tiles = {},
@@ -59,6 +62,11 @@ function World.new(seed: number, now: number): World
 	for i = 0, MapGen.chunkCount() - 1 do
 		self.chunks[i] = {}
 	end
+	return self
+end
+
+function World.new(seed: number, now: number): World
+	local self = blank(seed, now)
 	self:respawn(now, true)
 	for _, pair in Balance.BOT_GUILDS do
 		self:newGuild(pair[1], pair[2], nil)
@@ -208,6 +216,9 @@ function World.addKingdom(self: World, kid: string, data: any, isBot: boolean, n
 		color = Balance.KINGDOM_COLORS[(self.colorIndex - 1) % #Balance.KINGDOM_COLORS + 1],
 		guild = nil,
 		joinedAt = now,
+		lastSeen = now,
+		-- Humans are online while a player is in the server; bots always act.
+		online = isBot,
 	}
 	k.castle = self:addEntity({ kind = "castle", kid = kid, x = x, y = y })
 	self.kingdoms[kid] = k
@@ -277,7 +288,8 @@ end
 
 function World.report(self: World, kid: string, report: any, now: number)
 	local k = self.kingdoms[kid]
-	if k then
+	-- Nobody reads a bot's reports; skipping them keeps the saved realm small.
+	if k and not k.isBot then
 		City.addReport(k.data, report, now)
 		self.dirtyKingdoms[kid] = true
 	end
@@ -1127,6 +1139,7 @@ function World.chunkView(self: World, chunk: number): { any }
 					g = if g then g.tag else nil,
 					gid = k.guild,
 					bot = k.isBot,
+					off = not k.online,
 					sh = City.isShielded(k.data, now),
 				})
 			end
@@ -1305,6 +1318,7 @@ function World.view(self: World, kid: string, now: number): any
 		power = self:power(k),
 		rank = rank,
 		kingdoms = self.kingdomCount,
+		realm = self.realmId,
 		castle = { x = castle.x, y = castle.y },
 		shielded = City.isShielded(data, now),
 		shieldUntil = data.shieldUntil,
@@ -1326,6 +1340,169 @@ function World.view(self: World, kid: string, now: number): any
 		unread = unread,
 		top = top,
 	}
+end
+
+-- Persistence -----------------------------------------------------------------------------------------------------------
+
+-- Online state of a human kingdom. Offline kingdoms stay on the map, keep producing and can be attacked, the way a
+-- castle stays in its kingdom when the player closes the game.
+function World.setOnline(self: World, kid: string, online: boolean, now: number)
+	local k = self.kingdoms[kid]
+	if not k then
+		return
+	end
+	self:settleKingdom(k, now)
+	k.online = online
+	k.lastSeen = now
+	self.dirtyKingdoms[kid] = true
+	local castle = self:castleOf(k)
+	if castle then
+		self:touch(castle)
+	end
+end
+
+function World.counts(self: World): (number, number, number)
+	local humans, bots, online = 0, 0, 0
+	for _, k in self.kingdoms do
+		if k.isBot then
+			bots += 1
+		else
+			humans += 1
+			if k.online then
+				online += 1
+			end
+		end
+	end
+	return humans, bots, online
+end
+
+-- Removes the weakest bot (its armies come home first). Used as humans arrive and bots give way.
+function World.retireBot(self: World, now: number): string?
+	local weakest, weakestPower = nil, math.huge
+	for _, k in self.kingdoms do
+		if k.isBot then
+			local p = self:power(k)
+			if p < weakestPower or (p == weakestPower and weakest and k.id < weakest.id) then
+				weakest, weakestPower = k, p
+			end
+		end
+	end
+	if not weakest then
+		return nil
+	end
+	self:removeKingdom(weakest.id, now)
+	return weakest.id
+end
+
+local SNAPSHOT_VERSION = 1
+
+-- A JSON-safe copy of the whole realm for the DataStore: lists instead of tables keyed by number ids.
+function World.snapshot(self: World, now: number): any
+	local entities = {}
+	for _, e in self.entities do
+		table.insert(entities, e)
+	end
+	table.sort(entities, function(a, b)
+		return a.id < b.id
+	end)
+	local kingdoms = {}
+	for _, k in self.kingdoms do
+		table.insert(kingdoms, {
+			id = k.id,
+			name = k.name,
+			isBot = k.isBot,
+			data = k.data,
+			castle = k.castle,
+			color = k.color,
+			guild = k.guild,
+			personality = k.personality,
+			joinedAt = k.joinedAt,
+			lastSeen = if k.online and not k.isBot then now else k.lastSeen,
+		})
+	end
+	table.sort(kingdoms, function(a, b)
+		return a.id < b.id
+	end)
+	local marches = {}
+	for _, m in self.marches do
+		table.insert(marches, m)
+	end
+	table.sort(marches, function(a, b)
+		return a.id < b.id
+	end)
+	local guilds = {}
+	for _, g in self.guilds do
+		table.insert(guilds, g)
+	end
+	table.sort(guilds, function(a, b)
+		return a.id < b.id
+	end)
+	return {
+		v = SNAPSHOT_VERSION,
+		realm = self.realmId,
+		seed = self.seed,
+		rng = self.rng.state,
+		savedAt = now,
+		nextEntity = self.nextEntity,
+		nextMarch = self.nextMarch,
+		nextGuild = self.nextGuild,
+		colorIndex = self.colorIndex,
+		lastRespawn = self.lastRespawn,
+		entities = entities,
+		kingdoms = kingdoms,
+		marches = marches,
+		guilds = guilds,
+	}
+end
+
+-- Rebuilds a realm from a snapshot and catches it up to `now`: production, finished jobs, and every march phase
+-- that ended while nobody was there, each resolved at the time it ended.
+function World.restore(snap: any, now: number): World
+	local self = blank(snap.seed, snap.savedAt or now)
+	self.realmId = snap.realm or 0
+	self.rng.state = snap.rng or self.rng.state
+	self.nextEntity = snap.nextEntity or 0
+	self.nextMarch = snap.nextMarch or 0
+	self.nextGuild = snap.nextGuild or 0
+	self.colorIndex = snap.colorIndex or 0
+	self.lastRespawn = snap.lastRespawn or now
+	for _, e in snap.entities or {} do
+		self.entities[e.id] = e
+		self.tiles[key(e.x, e.y)] = e.id
+		self.chunks[MapGen.chunkOf(e.x, e.y)][e.id] = true
+		if e.kind == "node" then
+			self.nodeCount += 1
+		elseif e.kind == "monster" then
+			self.monsterCount += 1
+		end
+	end
+	for _, saved in snap.kingdoms or {} do
+		local data = Schema.migrate(saved.data, saved.name, now)
+		self.kingdoms[saved.id] = {
+			id = saved.id,
+			name = saved.name,
+			isBot = saved.isBot,
+			data = data,
+			castle = saved.castle,
+			color = saved.color,
+			guild = saved.guild,
+			personality = saved.personality,
+			joinedAt = saved.joinedAt or now,
+			lastSeen = saved.lastSeen or now,
+			online = saved.isBot == true,
+		}
+		self.kingdomCount += 1
+	end
+	for _, m in snap.marches or {} do
+		self.marches[m.id] = m
+	end
+	for _, g in snap.guilds or {} do
+		self.guilds[g.id] = g
+	end
+	self:step(now)
+	self.castlesDirty = true
+	self.marchesDirty = true
+	return self
 end
 
 return World

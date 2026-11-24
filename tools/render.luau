@@ -160,6 +160,12 @@ me.peaceBroken = true
 me.questIndex = 9
 me.stats.gathered = 48000
 local mine = world:addKingdom("u0", me, false, 0)
+world.realmId = 3
+world:setOnline("u0", true, 0)
+-- A few other members are online too; the rest show as offline castles, as in a real realm.
+for i = Balance.BOT_COUNT + 1, Balance.BOT_COUNT + 6 do
+	world:setOnline("u" .. i, true, 0)
+end
 world:command("u0", "guildJoin", { guild = 1 }, 0)
 
 local function nearestCastle(filter: (any) -> boolean): any
