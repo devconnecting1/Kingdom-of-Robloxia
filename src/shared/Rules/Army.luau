@@ -35,8 +35,8 @@ end
 
 function Army.remove(from: Troops, troops: Troops)
 	for id, count in troops do
-		local left = (from[id] or 0) - count
-		;(from :: any)[id] = if left > 0 then left else nil
+		local left = (from[id] or 0) - count;
+		(from :: any)[id] = if left > 0 then left else nil
 	end
 end
 

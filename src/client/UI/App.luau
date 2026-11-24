@@ -153,11 +153,10 @@ local function topBar(state: any, actions: any): Kit.Element
 			Position = UDim2.fromOffset(px(Theme.safeLeft + 74), px(32)),
 			Size = UDim2.fromOffset(px(420), px(20)),
 			BackgroundTransparency = 1,
-			Text = "⚔ "
-				.. Format.thousands(view.power)
-				.. "   🏆 "
-				.. t("ui.rank", { rank = view.rank, total = view.kingdoms })
-				.. (if view.realm and view.realm > 0 then "   🌍 " .. t("ui.realm", { n = view.realm }) else ""),
+			Text = "⚔ " .. Format.thousands(view.power) .. "   🏆 " .. t(
+				"ui.rank",
+				{ rank = view.rank, total = view.kingdoms }
+			) .. (if view.realm and view.realm > 0 then "   🌍 " .. t("ui.realm", { n = view.realm }) else ""),
 			TextSize = px(14),
 			Font = Theme.fonts.bold,
 			TextColor3 = Theme.color("gold"),

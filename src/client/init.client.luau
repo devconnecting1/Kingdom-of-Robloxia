@@ -89,7 +89,8 @@ local function onPush(topic: string, a: any, b: any)
 end
 
 local function readStatus()
-	state.status = { key = player:GetAttribute("KoRStatus") or "lobby.finding", realm = player:GetAttribute("KoRRealm") }
+	state.status =
+		{ key = player:GetAttribute("KoRStatus") or "lobby.finding", realm = player:GetAttribute("KoRRealm") }
 	changed()
 end
 player:GetAttributeChangedSignal("KoRStatus"):Connect(readStatus)

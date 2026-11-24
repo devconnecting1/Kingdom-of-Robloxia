@@ -524,18 +524,16 @@ function Map.render(state: any, actions: any): Kit.Element
 			{ Position = UDim2.fromOffset(px(14), px(14)), Size = UDim2.fromOffset(px(214), px(52)), ZIndex = 20 },
 			{
 				label = C.text({
-					text = "📍 "
-						.. t("ui.coords", { x = math.floor(camX + 0.5), y = math.floor(camY + 0.5) }),
+					text = "📍 " .. t("ui.coords", { x = math.floor(camX + 0.5), y = math.floor(camY + 0.5) }),
 					size = 15,
 					font = "bold",
 					Position = UDim2.fromOffset(px(12), px(4)),
 					Size = UDim2.new(1, -px(12), 0, px(22)),
 				}),
 				zone = C.text({
-					text = t(
-						"ui.zone",
-						{ z = MapGen.zone(math.floor(camX + 0.5), math.floor(camY + 0.5)) }
-					) .. " · " .. t("ui.marches", { used = #state.view.marches, max = state.view.marchSlots }),
+					text = t("ui.zone", { z = MapGen.zone(math.floor(camX + 0.5), math.floor(camY + 0.5)) })
+						.. " · "
+						.. t("ui.marches", { used = #state.view.marches, max = state.view.marchSlots }),
 					size = 12,
 					color = "muted",
 					Position = UDim2.fromOffset(px(12), px(26)),

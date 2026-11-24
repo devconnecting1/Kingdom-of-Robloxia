@@ -96,7 +96,8 @@ return function(test, expect, load)
 		a.data.peaceBroken = true
 		local b = world.kingdoms.u2
 		b.data.troops.cav1 = 500
-		local ok = world:command("u2", "march", { kind = "attack", x = castle.x, y = castle.y, troops = { cav1 = 500 } }, 20)
+		local ok =
+			world:command("u2", "march", { kind = "attack", x = castle.x, y = castle.y, troops = { cav1 = 500 } }, 20)
 		expect.truthy(ok)
 	end)
 
@@ -110,7 +111,8 @@ return function(test, expect, load)
 				node = e
 			end
 		end
-		local ok, marchId = world:command("u1", "march", { kind = "gather", x = node.x, y = node.y, troops = { inf1 = 60 } }, 0)
+		local ok, marchId =
+			world:command("u1", "march", { kind = "gather", x = node.x, y = node.y, troops = { inf1 = 60 } }, 0)
 		expect.truthy(ok, tostring(marchId))
 		local _, job = world:command("u1", "upgrade", { building = "farm" }, 0)
 		world:step(5)

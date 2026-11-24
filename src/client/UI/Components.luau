@@ -24,8 +24,10 @@ local VALIGN = {
 	Center = Enum.VerticalAlignment.Center,
 	Bottom = Enum.VerticalAlignment.Bottom,
 }
-local TEXT_X = { Left = Enum.TextXAlignment.Left, Center = Enum.TextXAlignment.Center, Right = Enum.TextXAlignment.Right }
-local TEXT_Y = { Top = Enum.TextYAlignment.Top, Center = Enum.TextYAlignment.Center, Bottom = Enum.TextYAlignment.Bottom }
+local TEXT_X =
+	{ Left = Enum.TextXAlignment.Left, Center = Enum.TextXAlignment.Center, Right = Enum.TextXAlignment.Right }
+local TEXT_Y =
+	{ Top = Enum.TextYAlignment.Top, Center = Enum.TextYAlignment.Center, Bottom = Enum.TextYAlignment.Bottom }
 
 C.e = e
 C.t = Locale.t
