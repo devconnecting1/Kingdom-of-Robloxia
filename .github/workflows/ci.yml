@@ -24,15 +24,19 @@ jobs:
       - uses: ./.github/actions/setup-luau
       - name: StyLua
         run: bash scripts/ci/run.sh "StyLua" stylua --check src tests tools
+      # Every check runs even when an earlier one failed, so one push shows every problem.
       - name: Selene
+        if: success() || failure()
         run: bash scripts/ci/run.sh "Selene" selene src
       - name: Type check (luau-lsp, strict)
+        if: success() || failure()
         run: |
           rojo sourcemap default.project.json --output sourcemap.json
           curl -fsSL -o globalTypes.d.luau https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.luau \
             || curl -fsSL -o globalTypes.d.luau https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.None.d.luau
           bash scripts/ci/run.sh "luau-lsp" luau-lsp analyze --definitions=globalTypes.d.luau --sourcemap=sourcemap.json src
       - name: Tests (Lune) — rules, protocol, locale and a 50-kingdom simulation
+        if: success() || failure()
         run: lune run tests/run.luau
 
   place:
@@ -65,8 +69,10 @@ jobs:
       - name: Prettier
         run: bash ../scripts/ci/run.sh "Prettier" npx prettier --check .
       - name: ESLint
+        if: success() || failure()
         run: bash ../scripts/ci/run.sh "ESLint" npx eslint .
       - name: Render the Luau UI to scenes (Lune)
+        if: success() || failure()
         working-directory: .
         run: lune run tools/render.luau
       - run: npm run build

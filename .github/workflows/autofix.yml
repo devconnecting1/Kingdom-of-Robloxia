@@ -33,7 +33,9 @@ jobs:
         run: |
           if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
           npx prettier --write .
+      # Formatting is still committed when the screenshots fail; CI reports the failure.
       - name: Render scenes and screenshots
+        continue-on-error: true
         run: |
           lune run tools/render.luau
           cd preview

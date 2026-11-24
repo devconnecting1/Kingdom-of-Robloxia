@@ -13,6 +13,32 @@ local extraGlobals: { [string]: any } = {}
 
 local Node = {}
 
+-- Lune's file functions yield, and nothing may yield inside a metamethod (`script.Parent.X` is one), so the whole
+-- source tree is read once up front and lookups use these tables.
+local files: { [string]: string } = {}
+local dirs: { [string]: boolean } = {}
+
+local function scan(dir: string)
+	dirs[dir] = true
+	for _, name in fs.readDir(dir) do
+		local path = dir .. "/" .. name
+		if fs.isDir(path) then
+			scan(path)
+		elseif string.match(name, "%.luau?$") then
+			files[path] = fs.readFile(path)
+		end
+	end
+end
+scan("src")
+
+local function isFile(path: string): boolean
+	return files[path] ~= nil
+end
+
+local function isDir(path: string): boolean
+	return dirs[path] == true
+end
+
 local function dirname(path: string): string
 	return string.match(path, "^(.*)/[^/]+$") or ""
 end
@@ -39,14 +65,14 @@ local function childOf(node: any, name: string): any
 	local dir = node.__path
 	for _, ext in { ".luau", ".lua" } do
 		local file = dir .. "/" .. name .. ext
-		if fs.isFile(file) then
+		if isFile(file) then
 			return makeNode(dir .. "/" .. name, file, false)
 		end
 	end
 	local sub = dir .. "/" .. name
-	if fs.isDir(sub) then
+	if isDir(sub) then
 		for _, init in { "init.luau", "init.lua" } do
-			if fs.isFile(sub .. "/" .. init) then
+			if isFile(sub .. "/" .. init) then
 				return makeNode(sub, sub .. "/" .. init, true)
 			end
 		end
@@ -61,7 +87,7 @@ local function parentOf(node: any): any
 		return nil
 	end
 	for _, init in { "init.luau", "init.lua" } do
-		if fs.isFile(parent .. "/" .. init) then
+		if isFile(parent .. "/" .. init) then
 			return makeNode(parent, parent .. "/" .. init, true)
 		end
 	end
@@ -157,7 +183,7 @@ local function requireNode(node: any): any
 			return baseEnv[key]
 		end,
 	})
-	local chunk = luau.load(fs.readFile(file), {
+	local chunk = luau.load(files[file], {
 		debugName = file,
 		environment = env,
 		injectGlobals = false,
