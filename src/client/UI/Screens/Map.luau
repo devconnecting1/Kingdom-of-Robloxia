@@ -83,12 +83,6 @@ local DECOR = {
 	crown = { icon = "✨", chance = 0.12 },
 	meadow = { icon = "🌼", chance = 0.06 },
 }
-	forest = { "🌲", 0.55 },
-	hills = { "⛰️", 0.45 },
-	lake = { "🌊", 0.2 },
-	crown = { "✨", 0.12 },
-	meadow = { "🌼", 0.06 },
-}
 
 local function terrain(
 	state: any,
