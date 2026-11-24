@@ -38,12 +38,12 @@ local LAYOUT = {
 	wall = { 2, 3, 2, 1 },
 }
 local SCENERY = {
-	{ 1, 2, "🌳" },
-	{ 4, 2, "⛲" },
-	{ 0, 3, "🌲" },
-	{ 1, 3, "🌻" },
-	{ 4, 3, "🐑" },
-	{ 5, 3, "🌲" },
+	{ x = 1, y = 2, icon = "🌳" },
+	{ x = 4, y = 2, icon = "⛲" },
+	{ x = 0, y = 3, icon = "🌲" },
+	{ x = 1, y = 3, icon = "🌻" },
+	{ x = 4, y = 3, icon = "🐑" },
+	{ x = 5, y = 3, icon = "🌲" },
 }
 
 local function plot(state: any, actions: any, id: string, cell: number, gap: number): Kit.Element
@@ -153,10 +153,10 @@ function City.render(state: any, actions: any): Kit.Element
 	end
 	for i, deco in SCENERY do
 		plots["deco" .. i] = C.text({
-			text = deco[3],
+			text = deco.icon,
 			size = math.floor(cell * 0.45),
 			align = "Center",
-			Position = UDim2.fromOffset(px(deco[1] * (cell + gap)), px(deco[2] * (cell + gap))),
+			Position = UDim2.fromOffset(px(deco.x * (cell + gap)), px(deco.y * (cell + gap))),
 			Size = UDim2.fromOffset(px(cell), px(cell)),
 			TextTransparency = 0.15,
 		})

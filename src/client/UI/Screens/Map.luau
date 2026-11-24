@@ -30,16 +30,32 @@ function Map.tileSize(state: any): number
 	return math.floor(Map.BASE_TILE * state.map.zoom)
 end
 
+-- The camera centre, kept far enough from the edges that the view never shows outside the realm.
+function Map.camera(state: any): (number, number)
+	local dw, dh = Theme.designSize()
+	local tile = Map.tileSize(state)
+	local halfX, halfY = dw / tile / 2, (dh - TOP - NAV) / tile / 2
+	local function clamp(v: number, half: number): number
+		local lo, hi = half - 0.5, SIZE - half - 0.5
+		if lo > hi then
+			return (SIZE - 1) / 2
+		end
+		return math.clamp(v, lo, hi)
+	end
+	return clamp(state.map.x, halfX), clamp(state.map.y, halfY)
+end
+
 -- Visible tile range for the camera, with a one-tile margin.
 function Map.range(state: any): (number, number, number, number)
 	local dw, dh = Theme.designSize()
 	local h = dh - TOP - NAV
 	local tile = Map.tileSize(state)
+	local cx, cy = Map.camera(state)
 	local halfX, halfY = dw / tile / 2, h / tile / 2
-	local x0 = math.max(0, math.floor(state.map.x - halfX) - 1)
-	local y0 = math.max(0, math.floor(state.map.y - halfY) - 1)
-	local x1 = math.min(SIZE - 1, math.ceil(state.map.x + halfX) + 1)
-	local y1 = math.min(SIZE - 1, math.ceil(state.map.y + halfY) + 1)
+	local x0 = math.max(0, math.floor(cx - halfX) - 1)
+	local y0 = math.max(0, math.floor(cy - halfY) - 1)
+	local x1 = math.min(SIZE - 1, math.ceil(cx + halfX) + 1)
+	local y1 = math.min(SIZE - 1, math.ceil(cy + halfY) + 1)
 	return x0, y0, x1, y1
 end
 
@@ -61,6 +77,12 @@ function Map.visibleChunks(state: any): { number }
 end
 
 local DECOR = {
+	forest = { icon = "🌲", chance = 0.55 },
+	hills = { icon = "⛰️", chance = 0.45 },
+	lake = { icon = "🌊", chance = 0.2 },
+	crown = { icon = "✨", chance = 0.12 },
+	meadow = { icon = "🌼", chance = 0.06 },
+}
 	forest = { "🌲", 0.55 },
 	hills = { "⛰️", 0.45 },
 	lake = { "🌊", 0.2 },
@@ -91,7 +113,7 @@ local function terrain(
 				BackgroundColor3 = Theme.shade(Theme.biomes[biome], shade),
 				BorderSizePixel = 0,
 				AutoButtonColor = false,
-				Text = if decor and h < decor[2] then decor[1] else "",
+				Text = if decor and h < decor.chance then decor.icon else "",
 				TextSize = px(tile * 0.42),
 				TextTransparency = 0.25,
 				Font = Theme.fonts.bold,
@@ -286,9 +308,10 @@ local function minimap(state: any): Kit.Element
 	local dw, dh = Theme.designSize()
 	local tile = Map.tileSize(state)
 	local vw, vh = dw / tile, (dh - TOP - NAV) / tile
+	local camX, camY = Map.camera(state)
 	kids.view = e("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
-		Position = UDim2.fromOffset(px((state.map.x + 0.5) * scale), px((state.map.y + 0.5) * scale)),
+		Position = UDim2.fromOffset(px((camX + 0.5) * scale), px((camY + 0.5) * scale)),
 		Size = UDim2.fromOffset(px(vw * scale), px(vh * scale)),
 		BackgroundTransparency = 1,
 		ZIndex = 10,
@@ -461,9 +484,10 @@ function Map.render(state: any, actions: any): Kit.Element
 	local h = dh - TOP - NAV
 	local tile = Map.tileSize(state)
 	local x0, y0, x1, y1 = Map.range(state)
+	local camX, camY = Map.camera(state)
 	local rangeKey = table.concat({ x0, y0, x1, y1, tile, state.view.seed, Theme.scale }, ",")
 	local canvas = e("Frame", {
-		Position = UDim2.fromOffset(px(dw / 2 - (state.map.x + 0.5) * tile), px(h / 2 - (state.map.y + 0.5) * tile)),
+		Position = UDim2.fromOffset(px(dw / 2 - (camX + 0.5) * tile), px(h / 2 - (camY + 0.5) * tile)),
 		Size = UDim2.fromOffset(px(SIZE * tile), px(SIZE * tile)),
 		BackgroundColor3 = Theme.color("#2C5A2E"),
 		BorderSizePixel = 0,
@@ -497,7 +521,7 @@ function Map.render(state: any, actions: any): Kit.Element
 			{
 				label = C.text({
 					text = "📍 "
-						.. t("ui.coords", { x = math.floor(state.map.x + 0.5), y = math.floor(state.map.y + 0.5) }),
+						.. t("ui.coords", { x = math.floor(camX + 0.5), y = math.floor(camY + 0.5) }),
 					size = 15,
 					font = "bold",
 					Position = UDim2.fromOffset(px(12), px(4)),
@@ -506,7 +530,7 @@ function Map.render(state: any, actions: any): Kit.Element
 				zone = C.text({
 					text = t(
 						"ui.zone",
-						{ z = MapGen.zone(math.floor(state.map.x + 0.5), math.floor(state.map.y + 0.5)) }
+						{ z = MapGen.zone(math.floor(camX + 0.5), math.floor(camY + 0.5)) }
 					) .. " · " .. t("ui.marches", { used = #state.view.marches, max = state.view.marchSlots }),
 					size = 12,
 					color = "muted",

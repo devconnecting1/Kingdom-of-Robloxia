@@ -132,6 +132,7 @@ UserInputService.InputChanged:Connect(function(input, processed)
 			state.dragMoved = true
 			local tile = Theme.px(Map.tileSize(state))
 			actions.mapPan(-delta.X / tile, -delta.Y / tile)
+			state.map.x, state.map.y = Map.camera(state)
 		end
 	end
 end)
@@ -225,6 +226,7 @@ RunService.RenderStepped:Connect(function(dt)
 		end
 		if pan.Magnitude > 0 then
 			actions.mapPan(pan.X * dt * 12, pan.Y * dt * 12)
+			state.map.x, state.map.y = Map.camera(state)
 		end
 	end
 	updateWatch(os.clock())

@@ -330,7 +330,7 @@ function World.settleKingdom(self: World, k: Kingdom, now: number)
 	end
 end
 
-handlers.upgrade = function(self: World, k: Kingdom, p: any, now: number)
+handlers.upgrade = function(self: World, k: Kingdom, p: any, now: number): ...any
 	local err, job = City.startUpgrade(k.data, p.building, now)
 	if not err then
 		self:addHelp(k, job, "building", p.building)
@@ -338,11 +338,11 @@ handlers.upgrade = function(self: World, k: Kingdom, p: any, now: number)
 	return err, job
 end
 
-handlers.train = function(_self: World, k: Kingdom, p: any, now: number)
+handlers.train = function(_self: World, k: Kingdom, p: any, now: number): ...any
 	return City.startTraining(k.data, p.troop, p.count, now)
 end
 
-handlers.research = function(self: World, k: Kingdom, p: any, now: number)
+handlers.research = function(self: World, k: Kingdom, p: any, now: number): ...any
 	local err, job = City.startResearch(k.data, p.tech, now)
 	if not err then
 		self:addHelp(k, job, "tech", p.tech)
@@ -350,7 +350,7 @@ handlers.research = function(self: World, k: Kingdom, p: any, now: number)
 	return err, job
 end
 
-handlers.finish = function(self: World, k: Kingdom, p: any, now: number)
+handlers.finish = function(self: World, k: Kingdom, p: any, now: number): ...any
 	local err = City.finishJob(k.data, p.job, now)
 	if not err then
 		self:settleKingdom(k, now)
@@ -358,30 +358,30 @@ handlers.finish = function(self: World, k: Kingdom, p: any, now: number)
 	return err
 end
 
-handlers.heal = function(_self: World, k: Kingdom)
+handlers.heal = function(_self: World, k: Kingdom): ...any
 	return City.heal(k.data)
 end
 
-handlers.recruit = function(_self: World, k: Kingdom, p: any)
+handlers.recruit = function(_self: World, k: Kingdom, p: any): ...any
 	return City.recruitHero(k.data, p.hero)
 end
 
-handlers.claimQuest = function(_self: World, k: Kingdom)
+handlers.claimQuest = function(_self: World, k: Kingdom): ...any
 	return City.claimQuest(k.data)
 end
 
-handlers.readReports = function(_self: World, k: Kingdom)
+handlers.readReports = function(_self: World, k: Kingdom): ...any
 	for _, r in k.data.reports do
 		r.read = true
 	end
 	return nil
 end
 
-handlers.march = function(self: World, k: Kingdom, p: any, now: number)
+handlers.march = function(self: World, k: Kingdom, p: any, now: number): ...any
 	return self:sendMarch(k, p, now)
 end
 
-handlers.recall = function(self: World, k: Kingdom, p: any, now: number)
+handlers.recall = function(self: World, k: Kingdom, p: any, now: number): ...any
 	local m = self.marches[p.march]
 	if not m or m.owner ~= k.id then
 		return "err.unknown"
@@ -393,7 +393,7 @@ handlers.recall = function(self: World, k: Kingdom, p: any, now: number)
 	return nil
 end
 
-handlers.relocate = function(self: World, k: Kingdom, p: any)
+handlers.relocate = function(self: World, k: Kingdom, p: any): ...any
 	if #self:marchesOf(k.id) > 0 then
 		return "err.marchesOut"
 	end
@@ -415,7 +415,7 @@ handlers.relocate = function(self: World, k: Kingdom, p: any)
 	return nil
 end
 
-handlers.guildCreate = function(self: World, k: Kingdom, p: any)
+handlers.guildCreate = function(self: World, k: Kingdom, p: any): ...any
 	if k.guild then
 		return "err.inGuild"
 	end
@@ -436,7 +436,7 @@ handlers.guildCreate = function(self: World, k: Kingdom, p: any)
 	return nil, g.id
 end
 
-handlers.guildJoin = function(self: World, k: Kingdom, p: any)
+handlers.guildJoin = function(self: World, k: Kingdom, p: any): ...any
 	local g = self.guilds[p.guild]
 	if not g then
 		return "err.unknown"
@@ -454,7 +454,7 @@ handlers.guildJoin = function(self: World, k: Kingdom, p: any)
 	return nil
 end
 
-handlers.guildLeave = function(self: World, k: Kingdom)
+handlers.guildLeave = function(self: World, k: Kingdom): ...any
 	if not k.guild then
 		return "err.nothing"
 	end
@@ -462,7 +462,7 @@ handlers.guildLeave = function(self: World, k: Kingdom)
 	return nil
 end
 
-handlers.guildHelp = function(self: World, k: Kingdom, _p: any, now: number)
+handlers.guildHelp = function(self: World, k: Kingdom, _p: any, now: number): ...any
 	local n = self:helpAll(k, now)
 	if n == 0 then
 		return "err.nothing"

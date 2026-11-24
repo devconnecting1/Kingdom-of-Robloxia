@@ -13,6 +13,20 @@ local e = Kit.e
 local px = Theme.px
 local C = {}
 
+-- Static lookups: indexing an Enum with a runtime string is unsafe for the type checker.
+local HALIGN = {
+	Left = Enum.HorizontalAlignment.Left,
+	Center = Enum.HorizontalAlignment.Center,
+	Right = Enum.HorizontalAlignment.Right,
+}
+local VALIGN = {
+	Top = Enum.VerticalAlignment.Top,
+	Center = Enum.VerticalAlignment.Center,
+	Bottom = Enum.VerticalAlignment.Bottom,
+}
+local TEXT_X = { Left = Enum.TextXAlignment.Left, Center = Enum.TextXAlignment.Center, Right = Enum.TextXAlignment.Right }
+local TEXT_Y = { Top = Enum.TextYAlignment.Top, Center = Enum.TextYAlignment.Center, Bottom = Enum.TextYAlignment.Bottom }
+
 C.e = e
 C.t = Locale.t
 
@@ -61,8 +75,8 @@ function C.list(direction: string?, gap: number?, halign: string?, valign: strin
 	return e("UIListLayout", {
 		FillDirection = if direction == "x" then Enum.FillDirection.Horizontal else Enum.FillDirection.Vertical,
 		Padding = UDim.new(0, px(gap or 8)),
-		HorizontalAlignment = Enum.HorizontalAlignment[halign or "Left"],
-		VerticalAlignment = Enum.VerticalAlignment[valign or "Top"],
+		HorizontalAlignment = HALIGN[halign or "Left"],
+		VerticalAlignment = VALIGN[valign or "Top"],
 		SortOrder = Enum.SortOrder.LayoutOrder,
 	})
 end
@@ -103,8 +117,8 @@ function C.text(p: TextProps): Kit.Element
 		TextSize = px(p.size or 16),
 		TextColor3 = Theme.color(p.color or "text"),
 		Font = Theme.fonts[p.font or "body"],
-		TextXAlignment = Enum.TextXAlignment[p.align or "Left"],
-		TextYAlignment = Enum.TextYAlignment[p.valign or "Center"],
+		TextXAlignment = TEXT_X[p.align or "Left"],
+		TextYAlignment = TEXT_Y[p.valign or "Center"],
 		TextWrapped = p.wrap or false,
 		TextTruncate = if p.wrap then Enum.TextTruncate.None else Enum.TextTruncate.AtEnd,
 		Size = UDim2.new(1, 0, 0, px((p.size or 16) + 6)),
@@ -126,7 +140,9 @@ function C.panel(props: { [string]: any }?, children: { [any]: any }?, style: st
 	if style ~= "flat" then
 		kids._gradient = if style == "hi" then C.gradient("panelHi", "panel") else C.gradient("panel2", "panel")
 	end
-	return e("Frame", C.merge({ BackgroundColor3 = Color3.fromRGB(255, 255, 255), BorderSizePixel = 0 }, props), kids)
+	-- A flat panel has no gradient to tint, so it takes the panel colour directly.
+	local background = if style == "flat" then Theme.color("panel2") else Color3.fromRGB(255, 255, 255)
+	return e("Frame", C.merge({ BackgroundColor3 = background, BorderSizePixel = 0 }, props), kids)
 end
 
 local VARIANTS = {
