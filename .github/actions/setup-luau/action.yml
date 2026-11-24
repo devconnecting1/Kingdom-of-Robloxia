@@ -1,0 +1,22 @@
+name: Set up the Luau toolchain
+description: Installs Rokit and every tool pinned in rokit.toml (Rojo, StyLua, Selene, Lune, luau-lsp).
+runs:
+  using: composite
+  steps:
+    - name: Install Rokit and the pinned tools
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        ROKIT_VERSION: v1.0.0
+      run: |
+        set -euo pipefail
+        mkdir -p "$RUNNER_TEMP/rokit"
+        gh release download "$ROKIT_VERSION" --repo rojo-rbx/rokit --pattern '*linux-x86_64.zip' --dir "$RUNNER_TEMP/rokit"
+        unzip -o -q "$RUNNER_TEMP"/rokit/*.zip -d "$RUNNER_TEMP/rokit"
+        "$RUNNER_TEMP/rokit/rokit" self-install
+        echo "$HOME/.rokit/bin" >> "$GITHUB_PATH"
+        export PATH="$HOME/.rokit/bin:$PATH"
+        # Authenticated so the shared runner IPs do not hit GitHub's anonymous rate limit.
+        rokit authenticate github --token "$GH_TOKEN"
+        rokit install --no-trust-check
+        rojo --version; stylua --version; selene --version; lune --version; luau-lsp --version

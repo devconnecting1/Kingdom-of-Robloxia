@@ -1,0 +1,53 @@
+# On working branches: format the code (StyLua, Prettier) and refresh docs/screenshots from the real UI, then commit
+# the result (and the npm lockfile, the first time) back to the branch. Nothing has to run on a developer's machine.
+# Never runs on main.
+name: Autofix
+
+on:
+  push:
+    branches: ["claude/**", "feature/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: autofix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  autofix:
+    name: Format and refresh screenshots
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-luau
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - name: Format Luau
+        run: stylua src tests tools
+      - name: Format TypeScript
+        working-directory: preview
+        run: |
+          if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi
+          npx prettier --write .
+      - name: Render scenes and screenshots
+        run: |
+          lune run tools/render.luau
+          cd preview
+          npm run build
+          npx playwright install --with-deps chromium
+          node scripts/screenshot.mjs ../docs/screenshots
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A src tests tools preview docs/screenshots
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore: format code and refresh UI screenshots [skip ci]"
+          git push
