@@ -29,13 +29,10 @@ function Modals.effect(id: string, level: number): string
 		return "–"
 	end
 	if def.produces and def.baseRate then
-		return t(
-			"eff.production",
-			{
-				v = Format.short(math.floor(def.baseRate * level ^ Balance.RATE_EXPONENT)),
-				res = t("res." .. def.produces),
-			}
-		)
+		return t("eff.production", {
+			v = Format.short(math.floor(def.baseRate * level ^ Balance.RATE_EXPONENT)),
+			res = t("res." .. def.produces),
+		})
 	elseif id == "keep" then
 		return t("eff.keep", { v = Format.short(Economy.storageCap(data)), level = level })
 	elseif id == "barracks" then
@@ -350,16 +347,12 @@ local function marchModal(state: any, actions: any, modal: any): Kit.Element
 				Position = UDim2.new(0, 0, 1, -px(128)),
 				Visible = not scouting,
 			}),
-			heroes = e(
-				"Frame",
-				{
-					AnchorPoint = Vector2.new(0, 1),
-					Position = UDim2.new(0, 0, 1, -px(86)),
-					Size = UDim2.new(1, 0, 0, px(38)),
-					BackgroundTransparency = 1,
-				},
-				heroes
-			),
+			heroes = e("Frame", {
+				AnchorPoint = Vector2.new(0, 1),
+				Position = UDim2.new(0, 0, 1, -px(86)),
+				Size = UDim2.new(1, 0, 0, px(38)),
+				BackgroundTransparency = 1,
+			}, heroes),
 			summary = C.text({
 				text = summary,
 				size = 14,
@@ -394,15 +387,11 @@ local function rankingModal(state: any, actions: any): Kit.Element
 				align = "Center",
 				Size = UDim2.fromOffset(px(50), px(44)),
 			}),
-			swatch = e(
-				"Frame",
-				{
-					Position = UDim2.fromOffset(px(52), px(14)),
-					Size = UDim2.fromOffset(px(16), px(16)),
-					BackgroundColor3 = Theme.color(r.color),
-				},
-				{ _corner = C.round() }
-			),
+			swatch = e("Frame", {
+				Position = UDim2.fromOffset(px(52), px(14)),
+				Size = UDim2.fromOffset(px(16), px(16)),
+				BackgroundColor3 = Theme.color(r.color),
+			}, { _corner = C.round() }),
 			name = C.text({
 				text = (if r.tag then "[" .. r.tag .. "] " else "") .. r.name .. (if r.isBot then "  🤖" else ""),
 				size = 15,

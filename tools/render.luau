@@ -212,18 +212,13 @@ local target = nearestCastle(function(k)
 end)
 if target then
 	world.kingdoms[target.kid].data.peaceBroken = true
-	world:command(
-		"u0",
-		"march",
-		{
-			kind = "attack",
-			x = target.x,
-			y = target.y,
-			troops = { cav2 = 420, cav1 = 800, inf2 = 300, sie1 = 300 },
-			hero = "aldric",
-		},
-		t
-	)
+	world:command("u0", "march", {
+		kind = "attack",
+		x = target.x,
+		y = target.y,
+		troops = { cav2 = 420, cav1 = 800, inf2 = 300, sie1 = 300 },
+		hero = "aldric",
+	}, t)
 end
 advance(t + 900)
 local scoutTarget = nearestCastle(function(k)

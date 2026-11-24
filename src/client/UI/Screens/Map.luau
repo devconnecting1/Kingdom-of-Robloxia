@@ -162,16 +162,12 @@ local function entityElement(state: any, ent: any, tile: number): Kit.Element
 			align = "Center",
 			Size = UDim2.fromScale(1, 0.8),
 		})
-		kids.level = C.badge(
-			tostring(ent.lv),
-			"bg",
-			{
-				Position = UDim2.fromOffset(px(2), px(2)),
-				TextSize = px(10),
-				Size = UDim2.fromOffset(px(16), px(16)),
-				BackgroundTransparency = 0.25,
-			}
-		)
+		kids.level = C.badge(tostring(ent.lv), "bg", {
+			Position = UDim2.fromOffset(px(2), px(2)),
+			TextSize = px(10),
+			Size = UDim2.fromOffset(px(16), px(16)),
+			BackgroundTransparency = 0.25,
+		})
 		kids.bar = e("Frame", {
 			AnchorPoint = Vector2.new(0.5, 1),
 			Position = UDim2.new(0.5, 0, 1, -px(4)),
@@ -520,25 +516,21 @@ function Map.render(state: any, actions: any): Kit.Element
 			},
 			"flat"
 		),
-		tools = e(
-			"Frame",
-			{
-				Position = UDim2.fromOffset(px(14), px(76)),
-				Size = UDim2.fromOffset(px(44), px(150)),
-				BackgroundTransparency = 1,
-				ZIndex = 20,
-			},
-			{
-				_list = C.list("y", 8),
-				home = C.iconButton("🏠", t("ui.home"), actions.mapHome, 44, { LayoutOrder = 1 }),
-				zoomIn = C.iconButton("＋", "zoom in", function()
-					actions.mapZoom(1)
-				end, 44, { LayoutOrder = 2 }),
-				zoomOut = C.iconButton("－", "zoom out", function()
-					actions.mapZoom(-1)
-				end, 44, { LayoutOrder = 3 }),
-			}
-		),
+		tools = e("Frame", {
+			Position = UDim2.fromOffset(px(14), px(76)),
+			Size = UDim2.fromOffset(px(44), px(150)),
+			BackgroundTransparency = 1,
+			ZIndex = 20,
+		}, {
+			_list = C.list("y", 8),
+			home = C.iconButton("🏠", t("ui.home"), actions.mapHome, 44, { LayoutOrder = 1 }),
+			zoomIn = C.iconButton("＋", "zoom in", function()
+				actions.mapZoom(1)
+			end, 44, { LayoutOrder = 2 }),
+			zoomOut = C.iconButton("－", "zoom out", function()
+				actions.mapZoom(-1)
+			end, 44, { LayoutOrder = 3 }),
+		}),
 		selection = selection(state, actions),
 		minimap = if Theme.compact then nil else minimap(state),
 	})

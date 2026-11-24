@@ -102,21 +102,17 @@ local function battleSide(title: string, before: any, dead: any, wounded: any, o
 		_pad = C.padding(12),
 		_list = C.list("y", 6),
 		title = C.text({ text = title, size = 16, font = "title", color = "gold", LayoutOrder = 0 }),
-		table = e(
-			"Frame",
-			{
-				Size = UDim2.new(1, 0, 0, 0),
-				AutomaticSize = Enum.AutomaticSize.Y,
-				BackgroundTransparency = 1,
-				LayoutOrder = 1,
-			},
-			{
-				t = troopTable(
-					{ { t("rep.before"), "text" }, { t("rep.dead"), "red" }, { t("rep.woundedCol"), "orange" } },
-					rows
-				),
-			}
-		),
+		table = e("Frame", {
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundTransparency = 1,
+			LayoutOrder = 1,
+		}, {
+			t = troopTable(
+				{ { t("rep.before"), "text" }, { t("rep.dead"), "red" }, { t("rep.woundedCol"), "orange" } },
+				rows
+			),
+		}),
 	}, "flat")
 end
 
@@ -283,15 +279,11 @@ function Reports.render(state: any, actions: any): Kit.Element
 			}),
 			dot = if r.read
 				then nil
-				else e(
-					"Frame",
-					{
-						Position = UDim2.fromOffset(px(6), px(6)),
-						Size = UDim2.fromOffset(px(10), px(10)),
-						BackgroundColor3 = Theme.color("red"),
-					},
-					{ _corner = C.round() }
-				),
+				else e("Frame", {
+					Position = UDim2.fromOffset(px(6), px(6)),
+					Size = UDim2.fromOffset(px(10), px(10)),
+					BackgroundColor3 = Theme.color("red"),
+				}, { _corner = C.round() }),
 		})
 	end
 	if #reports == 0 then
@@ -326,18 +318,14 @@ function Reports.render(state: any, actions: any): Kit.Element
 			else nil,
 		list = C.scroll({ Position = UDim2.fromOffset(0, px(48)), Size = UDim2.new(0.42, -px(8), 1, -px(48)) }, list),
 		detail = if selected
-			then C.panel(
-				{
-					AnchorPoint = Vector2.new(1, 0),
-					Position = UDim2.new(1, 0, 0, px(48)),
-					Size = UDim2.new(0.58, -px(8), 1, -px(48)),
-				},
-				{
-					_pad = C.padding(16),
-					body = detail(state, selected),
-				},
-				"hi"
-			)
+			then C.panel({
+				AnchorPoint = Vector2.new(1, 0),
+				Position = UDim2.new(1, 0, 0, px(48)),
+				Size = UDim2.new(0.58, -px(8), 1, -px(48)),
+			}, {
+				_pad = C.padding(16),
+				body = detail(state, selected),
+			}, "hi")
 			else nil,
 	})
 end

@@ -107,22 +107,18 @@ local function card(state: any, actions: any, id: string, order: number, busy: b
 			TextSize = px(12),
 			Size = UDim2.fromOffset(0, px(20)),
 		})
-		kids.xp = e(
-			"Frame",
-			{
-				Position = UDim2.new(0, px(12), 1, -px(52)),
-				Size = UDim2.new(1, -px(24), 0, px(14)),
-				BackgroundTransparency = 1,
-			},
-			{
-				bar = C.progress(
-					if level >= Balance.HERO_MAX_LEVEL then 1 else hero.xp / next,
-					"purple",
-					14,
-					t("ui.xp", { xp = Format.short(hero.xp), next = Format.short(next) })
-				),
-			}
-		)
+		kids.xp = e("Frame", {
+			Position = UDim2.new(0, px(12), 1, -px(52)),
+			Size = UDim2.new(1, -px(24), 0, px(14)),
+			BackgroundTransparency = 1,
+		}, {
+			bar = C.progress(
+				if level >= Balance.HERO_MAX_LEVEL then 1 else hero.xp / next,
+				"purple",
+				14,
+				t("ui.xp", { xp = Format.short(hero.xp), next = Format.short(next) })
+			),
+		})
 		kids.status = C.text({
 			text = if busy then "🚩 " .. t("ui.busy") else "✅ " .. t("ui.ready"),
 			size = 13,
