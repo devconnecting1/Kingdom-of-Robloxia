@@ -259,7 +259,7 @@ local function marches(state: any, tile: number): Kit.Element
 	return e("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 5 }, kids)
 end
 
-local function minimap(state: any, actions: any): Kit.Element
+local function minimap(state: any): Kit.Element
 	local s = 170
 	local scale = s / SIZE
 	local kids: { [any]: any } = { _corner = C.corner(10), _stroke = C.stroke("gold", 2, 0.2) }
@@ -540,7 +540,7 @@ function Map.render(state: any, actions: any): Kit.Element
 			}
 		),
 		selection = selection(state, actions),
-		minimap = if Theme.compact then nil else minimap(state, actions),
+		minimap = if Theme.compact then nil else minimap(state),
 	})
 end
 

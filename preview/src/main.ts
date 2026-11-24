@@ -1,7 +1,14 @@
 // Opens one scene (?scene=01-kingdom) or, without a parameter, a gallery of every scene.
 
 import { draw, measure } from "./layout";
-import type { Scene, SceneInfo } from "./types";
+import type { Scene, SceneInfo, UiNode } from "./types";
+
+// Lune's JSON encoder writes an empty table as {} or [], whichever it guesses: normalise both shapes.
+function normalise(node: UiNode): UiNode {
+  const children = Array.isArray(node.children) ? node.children : [];
+  const props = Array.isArray(node.props) ? {} : node.props;
+  return { ...node, props, children: children.map(normalise) };
+}
 
 const FONT_FAMILIES = ["600 20px Fredoka", "500 20px Montserrat", "700 20px Montserrat", "900 20px Montserrat"];
 
@@ -16,7 +23,8 @@ async function showScene(name: string): Promise<void> {
   if (!response.ok) {
     throw new Error(`scene ${name}: HTTP ${response.status}`);
   }
-  const scene = (await response.json()) as Scene;
+  const raw = (await response.json()) as Scene;
+  const scene: Scene = { ...raw, root: normalise(raw.root) };
   await loadFonts();
   const stage = document.createElement("div");
   stage.className = "stage";

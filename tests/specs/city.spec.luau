@@ -94,9 +94,10 @@ return function(test, expect, load)
 		local data = rich(Schema.new("A", 0))
 		local _, job = City.startUpgrade(data, "farm", 0)
 		local gold = data.resources.gold
-		expect.eq(City.finishJob(data, job.id, job.endAt - 5), nil)
+		local at = job.endAt - 5
+		expect.eq(City.finishJob(data, job.id, at), nil)
 		expect.eq(data.resources.gold, gold)
-		City.settle(data, job.endAt - 5)
+		City.settle(data, at)
 		expect.eq(data.buildings.farm, 2)
 		data.buildings.keep = 10
 		data.buildings.wall = 10

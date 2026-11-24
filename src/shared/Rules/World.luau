@@ -271,8 +271,8 @@ function World.power(self: World, k: Kingdom): number
 	return City.power(k.data, self:marchingTroops(k.id))
 end
 
-function World.toast(self: World, kid: string, key: string, params: any?)
-	table.insert(self.toasts, { kid = kid, key = key, params = params or {} })
+function World.toast(self: World, kid: string, textKey: string, params: any?)
+	table.insert(self.toasts, { kid = kid, key = textKey, params = params or {} })
 end
 
 function World.report(self: World, kid: string, report: any, now: number)

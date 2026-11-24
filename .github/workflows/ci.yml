@@ -32,8 +32,10 @@ jobs:
         if: success() || failure()
         run: |
           rojo sourcemap default.project.json --output sourcemap.json
-          curl -fsSL -o globalTypes.d.luau https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.luau \
-            || curl -fsSL -o globalTypes.d.luau https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.None.d.luau
+          # Definitions must match the pinned luau-lsp version (rokit.toml), not the newest ones on main.
+          version=$(luau-lsp --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+          base="https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/${version}/scripts"
+          curl -fsSL -o globalTypes.d.luau "$base/globalTypes.None.d.luau" || curl -fsSL -o globalTypes.d.luau "$base/globalTypes.d.luau"
           bash scripts/ci/run.sh "luau-lsp" luau-lsp analyze --definitions=globalTypes.d.luau --sourcemap=sourcemap.json src
       - name: Tests (Lune) — rules, protocol, locale and a 50-kingdom simulation
         if: success() || failure()
