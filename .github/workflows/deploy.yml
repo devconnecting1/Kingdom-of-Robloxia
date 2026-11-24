@@ -1,0 +1,68 @@
+# Publishes the place to Roblox with Open Cloud after the tests pass. A push to main saves a new version without
+# making it live; running the workflow by hand can publish it live. Needs three repository secrets:
+#   ROBLOX_CLOUD_API   Open Cloud API key with "universe-places: write" for this experience
+#   ROBLOX_UNIVERSE_ID the experience (universe) id
+#   ROBLOX_LOCAL_ID    the place id inside it
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      versionType:
+        description: "Saved (not live) or Published (live for players)"
+        type: choice
+        options: [Saved, Published]
+        default: Saved
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Tests before deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-luau
+      - run: lune run tests/run.luau
+
+  deploy:
+    name: Upload place (Open Cloud)
+    needs: test
+    runs-on: ubuntu-latest
+    env:
+      API_KEY: ${{ secrets.ROBLOX_CLOUD_API }}
+      UNIVERSE_ID: ${{ secrets.ROBLOX_UNIVERSE_ID }}
+      PLACE_ID: ${{ secrets.ROBLOX_LOCAL_ID }}
+      VERSION_TYPE: ${{ inputs.versionType || 'Saved' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-luau
+      - name: Check secrets
+        run: |
+          for name in API_KEY UNIVERSE_ID PLACE_ID; do
+            if [ -z "${!name}" ]; then echo "::error::Secret for $name is missing"; exit 1; fi
+          done
+      - run: mkdir -p build && rojo build default.project.json --output build/KingdomOfRobloxia.rbxl
+      - name: Upload the place
+        run: |
+          status=$(curl -sS -o response.json -w '%{http_code}' -X POST \
+            "https://apis.roblox.com/universes/v1/${UNIVERSE_ID}/places/${PLACE_ID}/versions?versionType=${VERSION_TYPE}" \
+            -H "x-api-key: ${API_KEY}" \
+            -H "Content-Type: application/octet-stream" \
+            --data-binary @build/KingdomOfRobloxia.rbxl)
+          echo "HTTP $status"; cat response.json; echo
+          test "$status" = "200"
+      - name: Server size 20 (the realm holds 20 players and 30 bots)
+        continue-on-error: true
+        run: |
+          curl -sS --fail-with-body -X PATCH \
+            "https://apis.roblox.com/cloud/v2/universes/${UNIVERSE_ID}/places/${PLACE_ID}?updateMask=serverSize" \
+            -H "x-api-key: ${API_KEY}" -H "Content-Type: application/json" \
+            -d '{"serverSize": 20}'

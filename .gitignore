@@ -1,0 +1,11 @@
+/build/
+*.rbxl
+*.rbxlx
+sourcemap.json
+globalTypes.d.luau
+/out/
+node_modules/
+/preview/dist/
+/preview/test-results/
+.DS_Store
+/preview/public/scenes/

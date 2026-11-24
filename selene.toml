@@ -1,0 +1,5 @@
+std = "roblox"
+
+[lints]
+# The UI kit reads props by name and components often ignore some of them.
+unused_variable = "warn"
